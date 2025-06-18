@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { prisma } from '@/lib/db'
 import { redis } from '@/lib/redis'
 
 export async function GET() {
   try {
     // Check database
-    await db.$queryRaw`SELECT 1`
+    await prisma.$queryRaw`SELECT 1`
     
     // Check Redis if available
     let redisStatus = 'not configured'

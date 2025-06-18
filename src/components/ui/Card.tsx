@@ -1,3 +1,5 @@
+'use client'
+
 import { cn } from '@/lib/utils'
 import { motion } from 'framer-motion'
 
@@ -27,6 +29,7 @@ export function Card({
   }
 
   if (variant === 'interactive') {
+    const { onClick, onMouseEnter, onMouseLeave, id, style, ...restProps } = props
     return (
       <motion.div
         whileHover={{ y: -2 }}
@@ -37,7 +40,11 @@ export function Card({
           variantClasses[variant],
           className
         )}
-        {...props}
+        onClick={onClick}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        id={id}
+        style={style}
       >
         {children}
       </motion.div>

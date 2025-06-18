@@ -1,6 +1,16 @@
 import { cn } from '@/lib/utils'
 import { Card } from '@/components/ui/Card'
-import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/24/solid'
+const ChevronUpIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+  </svg>
+)
+
+const ChevronDownIcon = ({ className }: { className?: string }) => (
+  <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+  </svg>
+)
 
 interface StatsCardProps {
   title: string
@@ -28,9 +38,9 @@ export function StatsCard({
           {change !== undefined && (
             <div className="mt-2 flex items-center text-sm">
               {trend === 'up' ? (
-                <ArrowUpIcon className="h-4 w-4 text-green-500" />
+                <ChevronUpIcon className="h-4 w-4 text-green-500" />
               ) : (
-                <ArrowDownIcon className="h-4 w-4 text-red-500" />
+                <ChevronDownIcon className="h-4 w-4 text-red-500" />
               )}
               <span
                 className={cn(

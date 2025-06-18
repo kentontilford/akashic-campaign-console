@@ -3,6 +3,8 @@ import { prisma } from '@/lib/db'
 import { redis } from '@/lib/redis'
 import { ElectionYear } from '@/types/mapping'
 
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams

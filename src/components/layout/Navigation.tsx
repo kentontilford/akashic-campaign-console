@@ -8,7 +8,9 @@ import { cn } from '@/lib/utils'
 import { Logo } from '@/components/ui/Logo'
 import { Button } from '@/components/ui/Button'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@heroicons/react/24/outline'
+const Bars3Icon = require('@heroicons/react/24/outline/Bars3Icon')
+const XMarkIcon = require('@heroicons/react/24/outline/XMarkIcon')
+const ChevronDownIcon = require('@heroicons/react/24/outline/ChevronDownIcon')
 import { Menu, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 import VersionSelector from '../version-control/VersionSelector'

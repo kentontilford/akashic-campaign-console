@@ -16,7 +16,14 @@ export class ApiError extends Error {
 
 export function handleApiError(error: unknown): NextResponse {
   // Log the error
-  logger.error('API Error:', error)
+  if (error instanceof Error) {
+    logger.error('API Error: ' + error.message, { 
+      stack: error.stack,
+      name: error.name 
+    })
+  } else {
+    logger.error('API Error: Unknown error', { error })
+  }
 
   // Handle Zod validation errors
   if (error instanceof ZodError) {

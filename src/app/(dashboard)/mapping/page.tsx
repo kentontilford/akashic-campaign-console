@@ -4,7 +4,15 @@ import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
 import PageLayout from '@/components/layout/PageLayout'
 import MapControls from '@/components/mapping/MapControls'
-import MapContainer from '@/components/mapping/MapContainer'
+import dynamic from 'next/dynamic'
+
+const MapContainer = dynamic(
+  () => import('@/components/mapping/MapContainer'),
+  { 
+    ssr: false,
+    loading: () => <div className="h-[600px] bg-gray-100 animate-pulse rounded-lg" />
+  }
+)
 import MapLegend from '@/components/mapping/MapLegend'
 import { MapDataType, ElectionYear } from '@/types/mapping'
 import toast from 'react-hot-toast'
