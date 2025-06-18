@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import logo styles */
+@import '../styles/logo.css';
+
 @layer base {
   :root {
     --background: 0 0% 100%;
