@@ -1,0 +1,26 @@
+[phases.setup]
+nixPkgs = ["nodejs-18_x"]
+
+[phases.install]
+cmds = ["npm ci --prefer-offline"]
+
+[phases.build]
+cmds = [
+  "echo '=== Build Environment Debug ==='",
+  "pwd",
+  "ls -la",
+  "echo '=== Checking tsconfig.json ==='",
+  "cat tsconfig.json",
+  "echo '=== Checking src structure ==='",
+  "find src -type f -name '*.ts' -o -name '*.tsx' | grep -E 'onboarding|version-control|PageLayout|MapControls|MapContainer' | sort",
+  "echo '=== Setting env vars ==='",
+  "export SKIP_ENV_VALIDATION=1",
+  "export DATABASE_URL='postgresql://build:build@localhost:5432/build'",
+  "echo '=== Running Prisma generate ==='",
+  "npm run prisma:generate",
+  "echo '=== Running Next.js build ==='",
+  "npm run build"
+]
+
+[start]
+cmd = "npm run start"
