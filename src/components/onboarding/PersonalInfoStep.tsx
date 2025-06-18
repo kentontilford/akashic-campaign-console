@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
 
 interface PersonalInfoData {
@@ -216,7 +217,7 @@ export default function PersonalInfoStep({ data, onUpdate }: PersonalInfoStepPro
         <div className="mt-1 flex items-center gap-4">
           <div className="h-24 w-24 rounded-full bg-gray-200 flex items-center justify-center">
             {data.photo ? (
-              <img src={data.photo} alt="Campaign" className="h-full w-full rounded-full object-cover" />
+              <Image src={data.photo} alt="Campaign" className="h-full w-full rounded-full object-cover" width={96} height={96} />
             ) : (
               <span className="text-gray-400 text-3xl">👤</span>
             )}

@@ -133,10 +133,10 @@ export default function ActivityFeed({ activities }: ActivityFeedProps) {
                     {activity.metadata && (
                       <div className="mt-2 text-sm text-gray-600">
                         {activity.type === 'MESSAGE_APPROVED' && activity.metadata.comments && (
-                          <p className="italic">"{activity.metadata.comments}"</p>
+                          <p className="italic">&quot;{activity.metadata.comments}&quot;</p>
                         )}
                         {activity.type === 'MESSAGE_REJECTED' && activity.metadata.comments && (
-                          <p className="italic">Reason: "{activity.metadata.comments}"</p>
+                          <p className="italic">Reason: &quot;{activity.metadata.comments}&quot;</p>
                         )}
                         {activity.type === 'MESSAGE_SCHEDULED' && activity.metadata.scheduledFor && (
                           <p>

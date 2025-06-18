@@ -57,7 +57,7 @@ export default function NewMessagePage() {
     }
     
     fetchCampaigns()
-  }, [])
+  }, [formData.campaignId])
 
   // Load template if templateId is provided
   useEffect(() => {

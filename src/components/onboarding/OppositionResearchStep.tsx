@@ -160,7 +160,7 @@ export default function OppositionResearchStep({ data, onUpdate }: OppositionRes
           {localData.opponents.length === 0 && (
             <div className="text-center py-6 text-gray-500">
               <p>No opponents added yet.</p>
-              <p className="text-sm">Click "Add Opponent" to begin opposition research.</p>
+              <p className="text-sm">Click &quot;Add Opponent&quot; to begin opposition research.</p>
             </div>
           )}
         </div>

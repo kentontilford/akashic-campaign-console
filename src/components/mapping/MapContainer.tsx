@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -37,6 +37,59 @@ export default function MapContainer({
   const router = useRouter()
   const [tooltipContent, setTooltipContent] = useState<any>(null)
   const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 })
+
+  const getSwingColor = useCallback((swing: number) => {
+    // Positive swing = Democratic gain (blue), Negative = Republican gain (red)
+    const maxSwing = 20 // Maximum expected swing percentage
+    const normalizedSwing = Math.max(-1, Math.min(1, swing / maxSwing))
+    
+    if (normalizedSwing > 0) {
+      // Democratic gain - shades of blue
+      const intensity = Math.abs(normalizedSwing)
+      return `rgba(37, 99, 235, ${0.3 + intensity * 0.7})`
+    } else if (normalizedSwing < 0) {
+      // Republican gain - shades of red
+      const intensity = Math.abs(normalizedSwing)
+      return `rgba(239, 68, 68, ${0.3 + intensity * 0.7})`
+    }
+    return '#e5e7eb' // Gray for no change
+  }, [])
+
+  const getDemographicColor = useCallback((value: number, metric: string) => {
+    // Simple gradient for demographic data
+    if (metric === 'income') {
+      const min = 30000
+      const max = 100000
+      const normalized = (value - min) / (max - min)
+      const intensity = Math.max(0, Math.min(1, normalized))
+      return `rgba(34, 197, 94, ${0.3 + intensity * 0.7})`
+    }
+    return '#e5e7eb'
+  }, [])
+
+  const getCountyStyle = useCallback((countyData: any, dataType: MapDataType) => {
+    const baseStyle = {
+      fillOpacity: 0.7,
+      weight: 1,
+      color: '#666',
+    }
+
+    if (!countyData) {
+      return { ...baseStyle, fillColor: '#ccc' }
+    }
+
+    if (dataType === 'election') {
+      // Color based on swing
+      const swing = countyData.swing || 0
+      const color = getSwingColor(swing)
+      return { ...baseStyle, fillColor: color }
+    } else {
+      // Color based on demographic metric (e.g., median income)
+      const value = countyData.medianHouseholdIncome || 0
+      const color = getDemographicColor(value, 'income')
+      return { ...baseStyle, fillColor: color }
+    }
+  }, [getSwingColor, getDemographicColor])
 
   useEffect(() => {
     if (!mapContainerRef.current || !data) return
@@ -116,60 +169,7 @@ export default function MapContainer({
     return () => {
       // Cleanup
     }
-  }, [data, dataType, fromYear, toYear, viewMode, selectedState, router])
-
-  const getCountyStyle = (countyData: any, dataType: MapDataType) => {
-    const baseStyle = {
-      fillOpacity: 0.7,
-      weight: 1,
-      color: '#666',
-    }
-
-    if (!countyData) {
-      return { ...baseStyle, fillColor: '#ccc' }
-    }
-
-    if (dataType === 'election') {
-      // Color based on swing
-      const swing = countyData.swing || 0
-      const color = getSwingColor(swing)
-      return { ...baseStyle, fillColor: color }
-    } else {
-      // Color based on demographic metric (e.g., median income)
-      const value = countyData.medianHouseholdIncome || 0
-      const color = getDemographicColor(value, 'income')
-      return { ...baseStyle, fillColor: color }
-    }
-  }
-
-  const getSwingColor = (swing: number) => {
-    // Positive swing = Democratic gain (blue), Negative = Republican gain (red)
-    const maxSwing = 20 // Maximum expected swing percentage
-    const normalizedSwing = Math.max(-1, Math.min(1, swing / maxSwing))
-    
-    if (normalizedSwing > 0) {
-      // Democratic gain - shades of blue
-      const intensity = Math.abs(normalizedSwing)
-      return `rgba(37, 99, 235, ${0.3 + intensity * 0.7})`
-    } else if (normalizedSwing < 0) {
-      // Republican gain - shades of red
-      const intensity = Math.abs(normalizedSwing)
-      return `rgba(239, 68, 68, ${0.3 + intensity * 0.7})`
-    }
-    return '#e5e7eb' // Gray for no change
-  }
-
-  const getDemographicColor = (value: number, metric: string) => {
-    // Simple gradient for demographic data
-    if (metric === 'income') {
-      const min = 30000
-      const max = 100000
-      const normalized = (value - min) / (max - min)
-      const intensity = Math.max(0, Math.min(1, normalized))
-      return `rgba(34, 197, 94, ${0.3 + intensity * 0.7})`
-    }
-    return '#e5e7eb'
-  }
+  }, [data, dataType, fromYear, toYear, viewMode, selectedState, router, getCountyStyle])
 
   const getStateBounds = (geoJson: any, stateAbbr: string): L.LatLngBounds | null => {
     // Calculate bounds for the selected state

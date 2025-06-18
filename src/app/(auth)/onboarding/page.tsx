@@ -248,7 +248,7 @@ export default function OnboardingPage() {
             Welcome to Akashic Intelligence
           </h1>
           <p className="text-lg text-gray-600">
-            Let's build a comprehensive profile to power your campaign's AI-driven messaging
+            Let&apos;s build a comprehensive profile to power your campaign&apos;s AI-driven messaging
           </p>
         </div>
 

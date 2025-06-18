@@ -61,7 +61,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             </h3>
             
             <p className="text-sm text-gray-600 mb-4">
-              This component encountered an error and couldn't be displayed.
+              This component encountered an error and couldn&apos;t be displayed.
             </p>
             
             <button

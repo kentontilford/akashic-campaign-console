@@ -81,7 +81,7 @@ export async function middleware(request: NextRequest) {
 
       // Different rate limits for different endpoints
       let limit = 100 // Default: 100 requests per 15 minutes
-      let windowMs = 15 * 60 * 1000
+      const windowMs = 15 * 60 * 1000
 
       if (pathname.startsWith('/api/auth/')) {
         limit = 10 // Auth endpoints: 10 attempts per 15 minutes

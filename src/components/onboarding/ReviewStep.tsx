@@ -102,7 +102,7 @@ export default function ReviewStep({ profile }: ReviewStepProps) {
               </div>
               <div className="sm:col-span-2">
                 <dt className="text-sm font-medium text-gray-500">Slogan</dt>
-                <dd className="text-sm text-gray-900 italic">"{profile.campaign.campaignSlogan}"</dd>
+                <dd className="text-sm text-gray-900 italic">&quot;{profile.campaign.campaignSlogan}&quot;</dd>
               </div>
             </dl>
           </div>

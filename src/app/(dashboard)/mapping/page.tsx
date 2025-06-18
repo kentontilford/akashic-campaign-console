@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useSession } from 'next-auth/react'
 import PageLayout from '@/components/layout/PageLayout'
 import MapControls from '@/components/mapping/MapControls'
@@ -27,12 +27,7 @@ export default function MappingPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [mapData, setMapData] = useState<any>(null)
 
-  // Load initial map data
-  useEffect(() => {
-    loadMapData()
-  }, [dataType, fromYear, toYear, viewMode, selectedState])
-
-  const loadMapData = async () => {
+  const loadMapData = useCallback(async () => {
     setIsLoading(true)
     try {
       if (dataType === 'election') {
@@ -60,8 +55,12 @@ export default function MappingPage() {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [dataType, fromYear, toYear, viewMode, selectedState])
 
+  // Load initial map data
+  useEffect(() => {
+    loadMapData()
+  }, [loadMapData])
 
   return (
     <PageLayout

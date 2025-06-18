@@ -156,7 +156,7 @@ export default function InviteTeamMember({ campaignId }: InviteTeamMemberProps) 
                         
                         <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
                           <p className="text-sm text-blue-800">
-                            An invitation email will be sent to this address. They'll need to create an account or sign in to join your campaign team.
+                            An invitation email will be sent to this address. They&apos;ll need to create an account or sign in to join your campaign team.
                           </p>
                         </div>
                       </div>

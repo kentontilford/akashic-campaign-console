@@ -91,7 +91,7 @@ export default async function ApprovalsPage() {
         <h1 className="text-3xl font-bold text-gray-900">Approval Queue</h1>
         <div className="card text-center py-12">
           <p className="text-gray-500">
-            You don't have permission to approve messages.
+            You don&apos;t have permission to approve messages.
           </p>
         </div>
       </div>
