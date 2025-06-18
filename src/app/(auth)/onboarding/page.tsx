@@ -3,16 +3,18 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import OnboardingProgress from '@/components/onboarding/OnboardingProgress'
-import PersonalInfoStep from '@/components/onboarding/PersonalInfoStep'
-import PoliticalBackgroundStep from '@/components/onboarding/PoliticalBackgroundStep'
-import ProfessionalBackgroundStep from '@/components/onboarding/ProfessionalBackgroundStep'
-import CampaignDetailsStep from '@/components/onboarding/CampaignDetailsStep'
-import PolicyPositionsStep from '@/components/onboarding/PolicyPositionsStep'
-import CommunityInvolvementStep from '@/components/onboarding/CommunityInvolvementStep'
-import CommunicationStyleStep from '@/components/onboarding/CommunicationStyleStep'
-import OppositionResearchStep from '@/components/onboarding/OppositionResearchStep'
-import ReviewStep from '@/components/onboarding/ReviewStep'
+import {
+  OnboardingProgress,
+  PersonalInfoStep,
+  PoliticalBackgroundStep,
+  ProfessionalBackgroundStep,
+  CampaignDetailsStep,
+  PolicyPositionsStep,
+  CommunityInvolvementStep,
+  CommunicationStyleStep,
+  OppositionResearchStep,
+  ReviewStep
+} from '@/components/onboarding'
 import { CandidateProfile } from '@/types/campaign-profile'
 import toast from 'react-hot-toast'
 
