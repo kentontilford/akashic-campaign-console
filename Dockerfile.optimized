@@ -1,0 +1,73 @@
+# Optimized Dockerfile combining all memory-saving strategies
+FROM node:20-alpine AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Install dependencies separately for better caching
+COPY package.json package-lock.json ./
+RUN npm ci --only=production && \
+    cp -R node_modules prod_node_modules && \
+    npm ci
+
+# Prisma stage
+FROM deps AS prisma
+COPY prisma ./prisma/
+RUN npm run prisma:generate
+
+# Builder stage with memory optimizations
+FROM node:20-alpine AS builder
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copy dependencies
+COPY --from=prisma /app/node_modules ./node_modules
+COPY --from=prisma /app/prisma ./prisma
+
+# Copy source files
+COPY . .
+
+# Use dynamic config for optimized builds
+RUN cp next.config.dynamic.mjs next.config.mjs
+
+# Environment setup
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV SKIP_ENV_VALIDATION=1
+
+# Build with memory optimizations
+RUN NODE_OPTIONS="--max-old-space-size=4096 --expose-gc" \
+    NEXT_PRIVATE_STANDALONE=true \
+    npm run build && \
+    # Clean up build artifacts to save space
+    rm -rf .next/cache && \
+    rm -rf node_modules
+
+# Production stage
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Create user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Copy only production files
+COPY --from=deps /app/prod_node_modules ./node_modules
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=prisma /app/prisma ./prisma
+
+# Set ownership
+RUN chown -R nextjs:nodejs /app
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]
