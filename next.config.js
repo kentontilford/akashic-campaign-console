@@ -4,12 +4,16 @@ const nextConfig = {
   swcMinify: true,
   output: 'standalone',
   experimental: {
-    serverActions: {
-      bodySizeLimit: '2mb',
-    },
+    // Force module resolution
+    externalDir: true,
   },
-  images: {
-    domains: ['akashic-intelligence.com'],
+  webpack: (config, { isServer }) => {
+    // Ensure proper module resolution
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname, './src'),
+    }
+    return config
   },
 }
 
