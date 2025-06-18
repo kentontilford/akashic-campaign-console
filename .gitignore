@@ -53,4 +53,4 @@ logs/
 
 # temporary files
 tmp/
-temp/
+temp/env.local
