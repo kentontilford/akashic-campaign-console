@@ -3,6 +3,7 @@
 import { formatDistanceToNow } from 'date-fns'
 import Link from 'next/link'
 import { ClockIcon, DocumentTextIcon, UserGroupIcon } from '@heroicons/react/24/outline'
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 
 interface Activity {
   id: string
@@ -37,48 +38,51 @@ export default function ActivitySummary({ activities }: ActivitySummaryProps) {
   const recentActivities = activities.slice(0, 5)
 
   return (
-    <div className="card">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-medium text-gray-900">Recent Activity</h3>
-        <Link
-          href="/activity"
-          className="text-sm text-akashic-primary hover:text-akashic-primary/80"
-        >
-          View all
-        </Link>
-      </div>
-
-      {recentActivities.length === 0 ? (
-        <p className="text-sm text-gray-500 text-center py-4">
-          No recent activity
-        </p>
-      ) : (
-        <div className="space-y-3">
-          {recentActivities.map((activity) => {
-            const Icon = getActivityIcon(activity.type)
-            const colorClass = getActivityColor(activity.type)
-            
-            return (
-              <div key={activity.id} className="flex items-start gap-3">
-                <div className={`mt-0.5 ${colorClass}`}>
-                  <Icon className="h-5 w-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900">
-                    <span className="font-medium">
-                      {activity.user.name || activity.user.email}
-                    </span>{' '}
-                    {activity.description}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
-                  </p>
-                </div>
-              </div>
-            )
-          })}
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>Recent Activity</CardTitle>
+          <Link
+            href="/activity"
+            className="text-sm text-brand-600 hover:text-brand-700 font-medium"
+          >
+            View all
+          </Link>
         </div>
-      )}
-    </div>
+      </CardHeader>
+      <CardContent>
+        {recentActivities.length === 0 ? (
+          <p className="text-sm text-gray-500 text-center py-4">
+            No recent activity
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {recentActivities.map((activity) => {
+              const Icon = getActivityIcon(activity.type)
+              const colorClass = getActivityColor(activity.type)
+              
+              return (
+                <div key={activity.id} className="flex items-start gap-3">
+                  <div className={`mt-0.5 ${colorClass}`}>
+                    <Icon className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-gray-900">
+                      <span className="font-medium">
+                        {activity.user.name || activity.user.email}
+                      </span>{' '}
+                      {activity.description}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {formatDistanceToNow(new Date(activity.createdAt), { addSuffix: true })}
+                    </p>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }
