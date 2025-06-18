@@ -11,7 +11,7 @@
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:migrate:deploy": "echo 'Skipping migrations - no migrations to deploy'",
+    "prisma:migrate:deploy": "prisma migrate deploy || prisma db push",
     "prisma:studio": "prisma studio",
     "prisma:seed": "tsx prisma/seed.ts",
     "check-env": "node scripts/check-env.js",

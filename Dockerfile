@@ -34,6 +34,8 @@ WORKDIR /app
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
+# Set memory limits for Node.js
+ENV NODE_OPTIONS="--max-old-space-size=512"
 
 # Create a non-root user
 RUN addgroup --system --gid 1001 nodejs
