@@ -55,9 +55,7 @@ Dockerfile
 docker-compose*.yml
 
 # Development files
-.eslintrc.json
 .prettierrc
-tsconfig.json
 jest.config.js
 
 # PM2
