@@ -272,4 +272,3 @@ export default function CommunityInvolvementStep({ data, onUpdate }: CommunityIn
   )
 }
 
-export default CommunityInvolvementStep

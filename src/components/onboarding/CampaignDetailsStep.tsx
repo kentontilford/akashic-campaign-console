@@ -222,4 +222,3 @@ export default function CampaignDetailsStep({ data, onUpdate }: CampaignDetailsS
   )
 }
 
-export default CampaignDetailsStep

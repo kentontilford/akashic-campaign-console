@@ -426,4 +426,3 @@ export default function PolicyPositionsStep({ data, onUpdate }: PolicyPositionsS
   )
 }
 
-export default PolicyPositionsStep

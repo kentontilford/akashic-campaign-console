@@ -316,4 +316,3 @@ export default function PoliticalBackgroundStep({ data, onUpdate }: PoliticalBac
   )
 }
 
-export default PoliticalBackgroundStep

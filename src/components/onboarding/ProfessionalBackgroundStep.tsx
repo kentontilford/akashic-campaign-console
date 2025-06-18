@@ -404,4 +404,3 @@ export default function ProfessionalBackgroundStep({ data, onUpdate }: Professio
   )
 }
 
-export default ProfessionalBackgroundStep

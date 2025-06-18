@@ -203,4 +203,3 @@ export default function CommunicationStyleStep({ data, onUpdate }: Communication
   )
 }
 
-export default CommunicationStyleStep

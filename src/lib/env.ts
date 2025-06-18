@@ -58,8 +58,10 @@ function validateEnv(): Env {
   }
 }
 
+// Create a cache for validated env
+let _cachedEnv: Env | null = null
+
 // Export validated environment variables
-// Use a Proxy to lazy-load and validate only when accessed
 export const env = new Proxy({} as Env, {
   get(target, prop) {
     // Skip validation during build
@@ -68,12 +70,11 @@ export const env = new Proxy({} as Env, {
     }
     
     // Validate on first access
-    if (!target._validated) {
-      Object.assign(target, validateEnv())
-      target._validated = true
+    if (!_cachedEnv) {
+      _cachedEnv = validateEnv()
     }
     
-    return target[prop as keyof Env]
+    return _cachedEnv[prop as keyof Env]
   }
 }) as Env
 

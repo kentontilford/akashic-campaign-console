@@ -203,4 +203,3 @@ export default function OppositionResearchStep({ data, onUpdate }: OppositionRes
   )
 }
 
-export default OppositionResearchStep
