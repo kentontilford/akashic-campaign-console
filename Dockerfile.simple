@@ -22,7 +22,7 @@ COPY . .
 # Set environment variables
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS="--max-old-space-size=512"
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 ENV SKIP_ENV_VALIDATION=1
 
 # Build the application
@@ -31,6 +31,10 @@ RUN npm run build
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
+
+# Copy static files for standalone mode
+RUN cp -r .next/static .next/standalone/.next/
+RUN cp -r public .next/standalone/
 
 # Change ownership
 RUN chown -R nextjs:nodejs /app
@@ -42,4 +46,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["node", "server.js"]
+CMD ["node", ".next/standalone/server.js"]
