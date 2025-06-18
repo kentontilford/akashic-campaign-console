@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "node --max-old-space-size=4096 ./node_modules/.bin/next build",
     "build:railway": "node scripts/build-with-memory.js",
+    "build:minimal": "node --max-old-space-size=4096 scripts/build-minimal.js",
     "start": "node server.js",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
