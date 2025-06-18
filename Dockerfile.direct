@@ -1,8 +1,8 @@
-# Simple Dockerfile without cache mounts for Railway
+# Dockerfile with direct memory control for Railway
 FROM node:20-alpine
 
-# Install dependencies
-RUN apk add --no-cache libc6-compat
+# Install dependencies including shell
+RUN apk add --no-cache libc6-compat bash
 
 WORKDIR /app
 
@@ -10,7 +10,7 @@ WORKDIR /app
 COPY package*.json ./
 COPY prisma ./prisma/
 
-# Install dependencies (no cache to avoid EBUSY errors)
+# Install dependencies
 RUN npm ci --no-cache
 
 # Generate Prisma client
@@ -19,22 +19,24 @@ RUN npm run prisma:generate
 # Copy application files
 COPY . .
 
+# Set permissions for scripts
+RUN chmod +x scripts/build.sh scripts/direct-build.js
+
 # Set environment variables
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV SKIP_ENV_VALIDATION=1
-ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-# Build the application with direct node execution
-RUN node --max-old-space-size=4096 scripts/direct-build.js
+# Build using shell script to ensure memory allocation
+RUN /bin/sh scripts/build.sh
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs
 
 # Copy static files for standalone mode
-RUN cp -r .next/static .next/standalone/.next/
-RUN cp -r public .next/standalone/
+RUN cp -r .next/static .next/standalone/.next/ || true
+RUN cp -r public .next/standalone/ || true
 
 # Change ownership
 RUN chown -R nextjs:nodejs /app
