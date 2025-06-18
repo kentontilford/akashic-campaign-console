@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+
+# Production build
+.next/
+out/
+build/
+dist/
+
+# Environment files
+.env
+.env.*
+
+# Prisma
+prisma/migrations/
+
+# Cache
+.cache/
+.turbo/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+coverage/
+
+# Scripts
+scripts/

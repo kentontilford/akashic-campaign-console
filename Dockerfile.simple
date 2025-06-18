@@ -22,11 +22,10 @@ COPY . .
 # Set environment variables
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_OPTIONS="--max-old-space-size=2048"
 ENV SKIP_ENV_VALIDATION=1
 
-# Build the application
-RUN npm run build
+# Build the application with increased memory
+RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
 # Create non-root user
 RUN addgroup --system --gid 1001 nodejs && \
