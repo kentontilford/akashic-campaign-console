@@ -4,10 +4,7 @@ import './globals.css'
 import AuthProvider from '@/components/providers/AuthProvider'
 import ToastProvider from '@/components/providers/ToastProvider'
 
-// Validate environment on startup (skip during build)
-if (process.env.NODE_ENV !== 'test' && process.env.SKIP_ENV_VALIDATION !== '1') {
-  import('@/lib/startup-validation')
-}
+// Skip validation during build
 
 const inter = Inter({ subsets: ['latin'] })
 

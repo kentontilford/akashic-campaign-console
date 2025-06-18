@@ -37,7 +37,7 @@ export type Env = z.infer<typeof envSchema>
 // Validate environment variables
 function validateEnv(): Env {
   // Skip validation during build time
-  if (process.env.SKIP_ENV_VALIDATION === '1') {
+  if (process.env.SKIP_ENV_VALIDATION === '1' || process.env.NEXT_PHASE === 'phase-production-build') {
     return process.env as any
   }
   

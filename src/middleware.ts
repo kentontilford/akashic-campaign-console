@@ -5,15 +5,7 @@ import { getToken } from 'next-auth/jwt'
 // Rate limiting configuration
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
 
-// Clean up old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, value] of rateLimitMap.entries()) {
-    if (value.resetTime < now) {
-      rateLimitMap.delete(key)
-    }
-  }
-}, 5 * 60 * 1000)
+// Cleanup handled inline during rate limit checks
 
 function rateLimit(identifier: string, limit: number = 100, windowMs: number = 15 * 60 * 1000) {
   const now = Date.now()
