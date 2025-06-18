@@ -1,0 +1,21 @@
+[phases.setup]
+nixPkgs = ["nodejs-18_x"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = [
+  "echo 'Starting build process...'",
+  "echo 'Node version:' && node --version",
+  "echo 'NPM version:' && npm --version",
+  "echo 'Environment variables:'",
+  "env | grep -E '(NODE_|SKIP_|NEXT_)' || true",
+  "echo 'Running Prisma generate...'",
+  "npm run prisma:generate",
+  "echo 'Running Next.js build...'",
+  "SKIP_ENV_VALIDATION=1 npm run build 2>&1 || (echo 'Build failed with exit code' $? && exit 1)"
+]
+
+[start]
+cmd = "npm run start"
