@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node --max-old-space-size=4096 ./node_modules/.bin/next build",
+    "build:railway": "node scripts/build-with-memory.js",
     "start": "node server.js",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
