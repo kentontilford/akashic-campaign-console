@@ -221,3 +221,5 @@ export default function CampaignDetailsStep({ data, onUpdate }: CampaignDetailsS
     </div>
   )
 }
+
+export default CampaignDetailsStep

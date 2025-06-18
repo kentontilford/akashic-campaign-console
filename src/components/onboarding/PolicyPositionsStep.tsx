@@ -425,3 +425,5 @@ export default function PolicyPositionsStep({ data, onUpdate }: PolicyPositionsS
     </div>
   )
 }
+
+export default PolicyPositionsStep

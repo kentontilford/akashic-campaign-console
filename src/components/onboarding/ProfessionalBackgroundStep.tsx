@@ -403,3 +403,5 @@ export default function ProfessionalBackgroundStep({ data, onUpdate }: Professio
     </div>
   )
 }
+
+export default ProfessionalBackgroundStep

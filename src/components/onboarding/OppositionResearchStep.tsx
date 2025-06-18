@@ -202,3 +202,5 @@ export default function OppositionResearchStep({ data, onUpdate }: OppositionRes
     </div>
   )
 }
+
+export default OppositionResearchStep

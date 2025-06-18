@@ -315,3 +315,5 @@ export default function PoliticalBackgroundStep({ data, onUpdate }: PoliticalBac
     </div>
   )
 }
+
+export default PoliticalBackgroundStep

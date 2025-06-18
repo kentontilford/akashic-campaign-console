@@ -271,3 +271,5 @@ export default function CommunityInvolvementStep({ data, onUpdate }: CommunityIn
     </div>
   )
 }
+
+export default CommunityInvolvementStep

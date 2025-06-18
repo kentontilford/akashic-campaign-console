@@ -202,3 +202,5 @@ export default function CommunicationStyleStep({ data, onUpdate }: Communication
     </div>
   )
 }
+
+export default CommunicationStyleStep
