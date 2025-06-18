@@ -1,0 +1,10 @@
+# Ignore files for Railway deployment
+node_modules
+.next
+.git
+.env
+.env.local
+.env.production.local
+*.log
+.DS_Store
+railway-debug-package.tar.gz
