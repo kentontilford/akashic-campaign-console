@@ -1,0 +1,21 @@
+[phases.setup]
+nixPkgs = ["nodejs_20", "npm-9_x", "openssl"]
+
+[phases.install]
+cmds = [
+    "rm -rf node_modules/.cache || true",
+    "npm ci --include=dev --cache=/tmp/.npm"
+]
+
+[phases.build]
+cmds = [
+    "npm run prisma:generate",
+    "npm run build",
+    "node test-build.js"
+]
+
+[start]
+cmd = "npm run start"
+
+[variables]
+NEXT_TELEMETRY_DISABLED = "1"
