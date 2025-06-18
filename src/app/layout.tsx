@@ -4,8 +4,8 @@ import './globals.css'
 import AuthProvider from '@/components/providers/AuthProvider'
 import ToastProvider from '@/components/providers/ToastProvider'
 
-// Validate environment on startup
-if (process.env.NODE_ENV !== 'test') {
+// Validate environment on startup (skip during build)
+if (process.env.NODE_ENV !== 'test' && process.env.SKIP_ENV_VALIDATION !== '1') {
   import('@/lib/startup-validation')
 }
 

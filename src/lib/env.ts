@@ -59,7 +59,23 @@ function validateEnv(): Env {
 }
 
 // Export validated environment variables
-export const env = validateEnv()
+// Use a Proxy to lazy-load and validate only when accessed
+export const env = new Proxy({} as Env, {
+  get(target, prop) {
+    // Skip validation during build
+    if (process.env.SKIP_ENV_VALIDATION === '1') {
+      return process.env[prop as string]
+    }
+    
+    // Validate on first access
+    if (!target._validated) {
+      Object.assign(target, validateEnv())
+      target._validated = true
+    }
+    
+    return target[prop as keyof Env]
+  }
+}) as Env
 
 // Helper function to generate NEXTAUTH_SECRET
 export function generateNextAuthSecret(): string {
