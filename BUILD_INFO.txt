@@ -1,0 +1,9 @@
+BUILD VERIFICATION FILE
+=======================
+Last Updated: 2025-06-18 19:15:00 UTC
+Build Method: Direct Node Execution
+Memory Allocation: 4096MB
+Dockerfile: Dockerfile.direct
+
+This file verifies that the new build configuration is being used.
+If you see this in the logs, the new Dockerfile is active.

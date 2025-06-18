@@ -1,9 +1,16 @@
 #!/usr/bin/env node
 
 // Direct build script that ensures memory allocation
+console.log('=================================');
+console.log('DIRECT BUILD SCRIPT EXECUTING');
+console.log('=================================');
 console.log('Starting direct build with proper memory allocation...');
+console.log(`Process ID: ${process.pid}`);
+console.log(`Node version: ${process.version}`);
 console.log(`Current heap limit: ${process.resourceUsage().maxRSS / 1024 / 1024} MB`);
 console.log(`NODE_OPTIONS: ${process.env.NODE_OPTIONS}`);
+console.log(`Memory limit: ${require('v8').getHeapStatistics().heap_size_limit / 1024 / 1024} MB`);
+console.log('=================================');
 
 // Force garbage collection if available
 if (global.gc) {
