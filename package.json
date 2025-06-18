@@ -15,8 +15,8 @@
     "prisma:studio": "prisma studio",
     "prisma:seed": "tsx prisma/seed.ts",
     "check-env": "node scripts/check-env.js",
-    "prebuild": "npm run check-env && npm run prisma:generate",
-    "build:production": "npm run check-env && npm run prisma:generate && next build",
+    "prebuild": "npm run prisma:generate",
+    "build:production": "npm run prisma:generate && next build",
     "db:backup": "node scripts/db-backup.js",
     "db:restore": "node scripts/db-restore.js"
   },

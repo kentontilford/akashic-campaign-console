@@ -25,9 +25,13 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
+# Set build-time environment variables
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+ENV SKIP_ENV_VALIDATION=1
+
 # Build the application
-ENV NEXT_TELEMETRY_DISABLED 1
-RUN npm run build
+RUN npm run build || (echo "Build failed. Checking for common issues..." && npm run typecheck && exit 1)
 
 # Stage 3: Runner
 FROM node:18-alpine AS runner

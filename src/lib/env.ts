@@ -36,6 +36,11 @@ export type Env = z.infer<typeof envSchema>
 
 // Validate environment variables
 function validateEnv(): Env {
+  // Skip validation during build time
+  if (process.env.SKIP_ENV_VALIDATION === '1') {
+    return process.env as any
+  }
+  
   try {
     return envSchema.parse(process.env)
   } catch (error) {

@@ -39,6 +39,6 @@ export function validateStartup() {
 }
 
 // Run validation immediately when imported
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== 'test' && process.env.SKIP_ENV_VALIDATION !== '1') {
   validateStartup()
 }
