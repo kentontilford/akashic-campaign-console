@@ -25,16 +25,19 @@ export interface GeneratedMessage {
 }
 
 export class AkashicAI {
-  private openai: OpenAI
+  private openai: OpenAI | null = null
 
-  constructor() {
-    if (!process.env.OPENAI_API_KEY) {
-      throw new Error('OPENAI_API_KEY is not configured. Please add it to your .env file.')
+  private getClient(): OpenAI {
+    if (!this.openai) {
+      if (!process.env.OPENAI_API_KEY) {
+        throw new Error('OPENAI_API_KEY is not configured. Please add it to your .env file.')
+      }
+      
+      this.openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY
+      })
     }
-    
-    this.openai = new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY
-    })
+    return this.openai
   }
 
   async generateMessage(params: MessageGenerationParams): Promise<GeneratedMessage> {
@@ -43,7 +46,7 @@ export class AkashicAI {
     const systemPrompt = VersionControlEngine.buildSystemPrompt(versionProfile, campaignContext)
     const userPrompt = this.buildUserPrompt(prompt, platform)
     
-    const response = await this.openai.chat.completions.create({
+    const response = await this.getClient().chat.completions.create({
       model: 'gpt-4',
       messages: [
         { role: 'system', content: systemPrompt },
@@ -181,7 +184,7 @@ ${improvements.map((imp, i) => `${i + 1}. ${imp}`).join('\n')}
 
 Please provide an improved version that addresses these suggestions while maintaining the audience profile guidelines.`
 
-    const response = await this.openai.chat.completions.create({
+    const response = await this.getClient().chat.completions.create({
       model: 'gpt-4',
       messages: [
         { role: 'system', content: systemPrompt },

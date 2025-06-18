@@ -1,20 +1,24 @@
 # Nixpacks configuration for Railway
 
+[providers]
+node = "18"
+
 [phases.setup]
-nixPkgs = ["nodejs-18_x", "npm-9_x"]
+nixPkgs = ["nodejs-18_x"]
 
 [phases.install]
-cmds = ["npm ci"]
+cmds = ["npm ci --production=false"]
 
 [phases.build]
 cmds = [
-  "npm run prisma:generate",
-  "SKIP_ENV_VALIDATION=1 npm run build"
+  "npx prisma generate",
+  "SKIP_ENV_VALIDATION=1 NODE_OPTIONS='--max-old-space-size=4096' npm run build"
 ]
 
 [start]
-cmd = "npm run start"
+cmd = "npm run prisma:migrate:deploy && npm run start"
 
 [variables]
 NODE_ENV = "production"
 SKIP_ENV_VALIDATION = "1"
+NODE_OPTIONS = "--max-old-space-size=4096"

@@ -88,4 +88,14 @@ class OptionalRedis {
   }
 }
 
-export const redis = new OptionalRedis()
+// Only initialize Redis in runtime, not during build
+let redisInstance: OptionalRedis | null = null
+
+export const redis = new Proxy({} as OptionalRedis, {
+  get(target, prop) {
+    if (!redisInstance && typeof window === 'undefined' && process.env.SKIP_ENV_VALIDATION !== '1') {
+      redisInstance = new OptionalRedis()
+    }
+    return redisInstance ? (redisInstance as any)[prop] : () => null
+  }
+})

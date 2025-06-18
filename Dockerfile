@@ -31,7 +31,7 @@ ENV NODE_OPTIONS="--max-old-space-size=4096"
 ENV SKIP_ENV_VALIDATION=1
 
 # Build the application
-RUN npm run build || (echo "Build failed. Checking for common issues..." && npm run typecheck && exit 1)
+RUN npm run build
 
 # Stage 3: Runner
 FROM node:18-alpine AS runner
