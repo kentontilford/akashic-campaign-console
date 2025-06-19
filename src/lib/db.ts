@@ -5,11 +5,13 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 const createPrismaClient = () => {
-  // Use different connection based on environment
-  const databaseUrl = process.env.NODE_ENV === 'production' 
-    ? process.env.DATABASE_URL 
-    : process.env.DATABASE_URL
-
+  // For production, prefer DIRECT_URL to avoid pooler issues
+  const databaseUrl = process.env.DIRECT_URL || process.env.DATABASE_URL || ''
+  
+  if (!databaseUrl) {
+    throw new Error('Database URL not configured')
+  }
+  
   const client = new PrismaClient({
     datasources: {
       db: {
