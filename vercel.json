@@ -8,12 +8,16 @@
     }
   },
   "env": {
-    "SKIP_ENV_VALIDATION": "1"
+    "SKIP_ENV_VALIDATION": "1",
+    "SKIP_REDIS": "true",
+    "DISABLE_RATE_LIMITING": "true"
   },
   "build": {
     "env": {
       "SKIP_ENV_VALIDATION": "1",
-      "NODE_OPTIONS": "--max-old-space-size=4096"
+      "NODE_OPTIONS": "--max-old-space-size=4096",
+      "SKIP_REDIS": "true",
+      "DISABLE_RATE_LIMITING": "true"
     }
   },
   "regions": ["iad1"],
