@@ -23,27 +23,25 @@ export function getDirectPool() {
     
     const isProduction = process.env.NODE_ENV === 'production'
     
-    // Configure SSL properly for production
-    let sslConfig: any = false
-    
-    if (isProduction || connectionString.includes('sslmode=require')) {
-      sslConfig = {
-        rejectUnauthorized: false,
-        // This is required for self-signed certificates
-        ca: undefined,
-        cert: undefined,
-        key: undefined
-      }
-    }
-    
-    pool = new Pool({
+    // Configure SSL - for Vercel/Supabase we need to handle self-signed certs
+    let poolConfig: any = {
       connectionString,
-      ssl: sslConfig,
       // Disable prepared statements for pgBouncer compatibility
       max: 1,
       idleTimeoutMillis: 0,
       connectionTimeoutMillis: 10000,
-    })
+    }
+    
+    if (isProduction && connectionString.includes('supabase')) {
+      // For Supabase in production, we need specific SSL settings
+      poolConfig.ssl = {
+        rejectUnauthorized: false,
+        // Explicitly set to handle self-signed certificates
+        checkServerIdentity: () => undefined,
+      }
+    }
+    
+    pool = new Pool(poolConfig)
   }
   
   return pool
