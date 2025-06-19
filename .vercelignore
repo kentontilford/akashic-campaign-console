@@ -40,3 +40,12 @@ Thumbs.db
 # Scripts not needed for production
 scripts/db-backup.js
 scripts/db-restore.js
+
+# Keep build diagnostic scripts
+!scripts/test-build.js
+!scripts/ensure-prisma.js
+
+# Temporary files
+cookies.txt
+*.tmp
+*.temp

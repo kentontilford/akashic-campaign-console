@@ -15,7 +15,7 @@
   "build": {
     "env": {
       "SKIP_ENV_VALIDATION": "1",
-      "NODE_OPTIONS": "--max-old-space-size=4096",
+      "NODE_OPTIONS": "--max-old-space-size=8192",
       "SKIP_REDIS": "true",
       "DISABLE_RATE_LIMITING": "true"
     }
