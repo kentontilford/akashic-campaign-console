@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 
 export default function AboutPage() {
+  // About page for Akashic Intelligence
   return (
     <main className="min-h-screen bg-white">
       {/* Header */}
