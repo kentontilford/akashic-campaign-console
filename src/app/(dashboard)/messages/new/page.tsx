@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import toast from 'react-hot-toast'
@@ -20,7 +20,7 @@ const platforms = [
   { id: Platform.SMS, name: 'SMS', icon: '💬' }
 ]
 
-export default function NewMessagePage() {
+function NewMessageForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { data: session } = useSession()
@@ -300,5 +300,20 @@ export default function NewMessagePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function NewMessagePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading message editor...</p>
+        </div>
+      </div>
+    }>
+      <NewMessageForm />
+    </Suspense>
   )
 }
