@@ -31,7 +31,9 @@ export default function SetupPage() {
         toast.success('Admin user created successfully!')
         router.push('/login')
       } else {
-        toast.error(data.error || 'Setup failed')
+        const errorMessage = data.message ? `${data.error}: ${data.message}` : data.error || 'Setup failed'
+        toast.error(errorMessage)
+        console.error('Setup error:', data)
       }
     } catch (error) {
       toast.error('An error occurred during setup')
