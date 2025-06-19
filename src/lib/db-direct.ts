@@ -13,6 +13,9 @@ export function getDirectPool() {
       throw new Error('No database connection string found')
     }
     
+    console.log('[DB] Using connection string from:', process.env.DIRECT_URL ? 'DIRECT_URL' : 'DATABASE_URL')
+    console.log('[DB] Connection host:', connectionString.match(/@([^:\/]+)/)?.[1])
+    
     // For Supabase, ensure SSL mode is set
     if (!connectionString.includes('sslmode=') && connectionString.includes('supabase')) {
       connectionString += connectionString.includes('?') ? '&sslmode=require' : '?sslmode=require'
@@ -20,11 +23,22 @@ export function getDirectPool() {
     
     const isProduction = process.env.NODE_ENV === 'production'
     
+    // Configure SSL properly for production
+    let sslConfig: any = false
+    
+    if (isProduction || connectionString.includes('sslmode=require')) {
+      sslConfig = {
+        rejectUnauthorized: false,
+        // This is required for self-signed certificates
+        ca: undefined,
+        cert: undefined,
+        key: undefined
+      }
+    }
+    
     pool = new Pool({
       connectionString,
-      ssl: isProduction ? { 
-        rejectUnauthorized: false
-      } : false,
+      ssl: sslConfig,
       // Disable prepared statements for pgBouncer compatibility
       max: 1,
       idleTimeoutMillis: 0,

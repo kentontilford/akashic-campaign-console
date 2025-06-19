@@ -52,9 +52,12 @@ export async function testDatabaseConnection() {
       message: 'Database connection successful'
     }
   } catch (error: any) {
+    console.error('[DB Test] Connection error:', error)
     return { 
       success: false, 
       error: error.message,
+      code: error.code,
+      detail: error.detail,
       message: 'Database connection failed'
     }
   }
