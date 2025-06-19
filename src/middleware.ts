@@ -117,8 +117,11 @@ export async function middleware(request: NextRequest) {
     try {
       const token = await getToken({ req: request }).catch(() => null)
       
-      // Require authentication for all non-GET API requests (except auth endpoints)
-      if (pathname.startsWith('/api/') && !pathname.startsWith('/api/auth/') && !token) {
+      // Require authentication for all non-GET API requests (except auth and setup endpoints)
+      if (pathname.startsWith('/api/') && 
+          !pathname.startsWith('/api/auth/') && 
+          !pathname.startsWith('/api/auth-setup') &&
+          !token) {
         return new NextResponse('Unauthorized', { 
           status: 401,
           headers: responseHeaders
