@@ -3,6 +3,7 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/db'
 import { verifyPassword } from '@/lib/password-validation'
+import { verifyUserCredentials } from '@/lib/auth-pooler-fix'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -26,27 +27,40 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
+        try {
+          // Use the pooler-safe auth function
+          const user = await verifyUserCredentials(credentials.email, credentials.password)
+          return user
+        } catch (error) {
+          console.error('Auth error:', error)
+          // Fallback to direct Prisma if raw SQL fails
+          try {
+            const user = await prisma.user.findUnique({
+              where: {
+                email: credentials.email
+              }
+            })
+
+            if (!user || !user.password) {
+              return null
+            }
+
+            const isPasswordValid = await verifyPassword(credentials.password, user.password)
+
+            if (!isPasswordValid) {
+              return null
+            }
+
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              role: user.role,
+            }
+          } catch (fallbackError) {
+            console.error('Fallback auth error:', fallbackError)
+            return null
           }
-        })
-
-        if (!user || !user.password) {
-          return null
-        }
-
-        const isPasswordValid = await verifyPassword(credentials.password, user.password)
-
-        if (!isPasswordValid) {
-          return null
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
         }
       }
     })

@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     }
     
     // The hash for "Admin123!"
-    const validHash = '$2a$10$YH.QNkbpbqk0cYbxgKJPzOm1GcWwGfvJX5dZGHqPBkqMQXz0nWhnS'
+    const validHash = '$2a$10$Xy8wyu6ps81ubRigNvqgLeqFp0ktI.aBvAN5k07p4IpGolwX3m9da'
     
     // Verify password
     const isValid = await bcrypt.compare(password, validHash)
