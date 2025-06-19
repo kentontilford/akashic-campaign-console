@@ -159,7 +159,7 @@ function LoginForm() {
           <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
             <p className="text-xs text-gray-600 mb-2">Try with demo credentials:</p>
             <p className="text-sm font-mono text-black">admin@akashic.com</p>
-            <p className="text-sm font-mono text-black">admin123</p>
+            <p className="text-sm font-mono text-black">Admin123!</p>
           </div>
         </form>
 
