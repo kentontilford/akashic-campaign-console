@@ -6,10 +6,19 @@ const globalForPrisma = globalThis as unknown as {
 
 const createPrismaClient = () => {
   // For production, prefer DIRECT_URL to avoid pooler issues
-  const databaseUrl = process.env.DIRECT_URL || process.env.DATABASE_URL || ''
+  let databaseUrl = process.env.DIRECT_URL || process.env.DATABASE_URL || ''
   
   if (!databaseUrl) {
     throw new Error('Database URL not configured')
+  }
+  
+  // For Supabase connections, disable SSL to avoid self-signed cert issues
+  if (databaseUrl.includes('supabase')) {
+    if (databaseUrl.includes('sslmode=')) {
+      databaseUrl = databaseUrl.replace(/sslmode=\w+/, 'sslmode=disable')
+    } else {
+      databaseUrl += databaseUrl.includes('?') ? '&sslmode=disable' : '?sslmode=disable'
+    }
   }
   
   const client = new PrismaClient({

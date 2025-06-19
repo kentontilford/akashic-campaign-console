@@ -24,53 +24,73 @@ import { CampaignHealthScore } from '@/components/dashboard/CampaignHealthScore'
 import { RecentActivityFeed } from '@/components/dashboard/RecentActivityFeed'
 
 async function getDashboardData(userId: string) {
-  const [campaigns, recentActivity, messageStats, voterReach] = await Promise.all([
-    prisma.campaignMember.findMany({
-      where: { userId },
-      include: {
-        campaign: {
-          include: {
-            _count: {
-              select: {
-                messages: true,
-                members: true
+  try {
+    const [campaigns, recentActivity, messageStats, voterReach] = await Promise.all([
+      prisma.campaignMember.findMany({
+        where: { userId },
+        include: {
+          campaign: {
+            include: {
+              _count: {
+                select: {
+                  messages: true,
+                  members: true
+                }
               }
             }
           }
         }
-      }
-    }),
-    prisma.activity.findMany({
-      where: {
-        campaign: {
-          members: {
-            some: { userId }
+      }).catch(err => {
+        console.error('Error fetching campaigns:', err)
+        return []
+      }),
+      prisma.activity.findMany({
+        where: {
+          campaign: {
+            members: {
+              some: { userId }
+            }
           }
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 10,
+        include: {
+          user: true,
+          campaign: true
         }
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 10,
-      include: {
-        user: true,
-        campaign: true
-      }
-    }),
-    prisma.message.groupBy({
-      by: ['status'],
-      where: {
-        campaign: {
-          members: {
-            some: { userId }
+      }).catch(err => {
+        console.error('Error fetching activities:', err)
+        return []
+      }),
+      prisma.message.groupBy({
+        by: ['status'],
+        where: {
+          campaign: {
+            members: {
+              some: { userId }
+            }
           }
-        }
-      },
-      _count: true
-    }),
-    // Mock voter reach data - in real app, calculate from message views/engagement
-    Promise.resolve(125000)
-  ])
+        },
+        _count: true
+      }).catch(err => {
+        console.error('Error fetching message stats:', err)
+        return []
+      }),
+      // Mock voter reach data - in real app, calculate from message views/engagement
+      Promise.resolve(125000)
+    ])
 
-  return { campaigns, recentActivity, messageStats, voterReach }
+    return { campaigns, recentActivity, messageStats, voterReach }
+  } catch (error) {
+    console.error('Dashboard data error:', error)
+    // Return empty data to allow dashboard to render
+    return { 
+      campaigns: [], 
+      recentActivity: [], 
+      messageStats: [], 
+      voterReach: 0 
+    }
+  }
 }
 
 function calculateHealthScore(campaigns: any[], messageStats: any[]) {
@@ -82,8 +102,37 @@ function calculateHealthScore(campaigns: any[], messageStats: any[]) {
 }
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.id) return null
+  let session
+  try {
+    session = await getServerSession(authOptions)
+  } catch (error) {
+    console.error('Session error:', error)
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Session Error</h2>
+          <p className="text-gray-600">Unable to verify your session. Please try logging in again.</p>
+          <MysticalButton asChild className="mt-4">
+            <Link href="/login">Sign In</Link>
+          </MysticalButton>
+        </div>
+      </div>
+    )
+  }
+  
+  if (!session?.user?.id) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Not Authenticated</h2>
+          <p className="text-gray-600">Please sign in to access your dashboard.</p>
+          <MysticalButton asChild className="mt-4">
+            <Link href="/login">Sign In</Link>
+          </MysticalButton>
+        </div>
+      </div>
+    )
+  }
 
   const { campaigns, recentActivity, messageStats, voterReach } = await getDashboardData(session.user.id)
 
