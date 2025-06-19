@@ -1,20 +1,19 @@
 import { NextAuthOptions } from 'next-auth'
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { prisma } from '@/lib/db'
-import { verifyPassword } from '@/lib/password-validation'
-import { verifyUserCredentials } from '@/lib/auth-pooler-fix'
+import { authenticateUser } from '@/lib/auth-simple'
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  // Remove Prisma adapter to avoid pooler issues
   session: {
-    strategy: 'jwt'
+    strategy: 'jwt',
+    maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   pages: {
     signIn: '/login',
     signOut: '/',
     error: '/auth/error',
   },
+  secret: process.env.NEXTAUTH_SECRET || 'fallback-secret-for-development',
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -24,44 +23,20 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+          console.log('[NextAuth] Missing credentials')
           return null
         }
 
-        try {
-          // Use the pooler-safe auth function
-          const user = await verifyUserCredentials(credentials.email, credentials.password)
-          return user
-        } catch (error) {
-          console.error('Auth error:', error)
-          // Fallback to direct Prisma if raw SQL fails
-          try {
-            const user = await prisma.user.findUnique({
-              where: {
-                email: credentials.email
-              }
-            })
-
-            if (!user || !user.password) {
-              return null
-            }
-
-            const isPasswordValid = await verifyPassword(credentials.password, user.password)
-
-            if (!isPasswordValid) {
-              return null
-            }
-
-            return {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              role: user.role,
-            }
-          } catch (fallbackError) {
-            console.error('Fallback auth error:', fallbackError)
-            return null
-          }
+        console.log('[NextAuth] Authenticating:', credentials.email)
+        const user = await authenticateUser(credentials.email, credentials.password)
+        
+        if (user) {
+          console.log('[NextAuth] Authentication successful')
+        } else {
+          console.log('[NextAuth] Authentication failed')
         }
+        
+        return user
       }
     })
   ],
