@@ -32,13 +32,16 @@ export function getDirectPool() {
       connectionTimeoutMillis: 10000,
     }
     
-    if (isProduction && connectionString.includes('supabase')) {
-      // For Supabase in production, we need specific SSL settings
-      poolConfig.ssl = {
-        rejectUnauthorized: false,
-        // Explicitly set to handle self-signed certificates
-        checkServerIdentity: () => undefined,
+    // For Supabase connections, we need to disable SSL verification
+    if (connectionString.includes('supabase')) {
+      // Override SSL settings in the connection string
+      if (connectionString.includes('sslmode=')) {
+        connectionString = connectionString.replace(/sslmode=\w+/, 'sslmode=disable')
+      } else {
+        connectionString += connectionString.includes('?') ? '&sslmode=disable' : '?sslmode=disable'
       }
+      poolConfig.connectionString = connectionString
+      poolConfig.ssl = false
     }
     
     pool = new Pool(poolConfig)
