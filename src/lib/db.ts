@@ -5,10 +5,15 @@ const globalForPrisma = globalThis as unknown as {
 }
 
 const createPrismaClient = () => {
+  // Use different connection based on environment
+  const databaseUrl = process.env.NODE_ENV === 'production' 
+    ? process.env.DATABASE_URL 
+    : process.env.DATABASE_URL
+
   const client = new PrismaClient({
     datasources: {
       db: {
-        url: process.env.DATABASE_URL,
+        url: databaseUrl,
       },
     },
     log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
