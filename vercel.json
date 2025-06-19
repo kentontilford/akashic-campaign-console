@@ -10,17 +10,14 @@
   "env": {
     "SKIP_ENV_VALIDATION": "1",
     "SKIP_REDIS": "true",
-    "DISABLE_RATE_LIMITING": "true",
-    "DATABASE_URL": "@POSTGRES_PRISMA_URL",
-    "OPENAI_API_KEY": "@OPEN_API_KEY"
+    "DISABLE_RATE_LIMITING": "true"
   },
   "build": {
     "env": {
       "SKIP_ENV_VALIDATION": "1",
       "NODE_OPTIONS": "--max-old-space-size=4096",
       "SKIP_REDIS": "true",
-      "DISABLE_RATE_LIMITING": "true",
-      "DATABASE_URL": "@POSTGRES_PRISMA_URL"
+      "DISABLE_RATE_LIMITING": "true"
     }
   },
   "regions": ["iad1"],
