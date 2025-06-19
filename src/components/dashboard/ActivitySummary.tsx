@@ -2,7 +2,7 @@
 
 import { formatDistanceToNow } from 'date-fns'
 import Link from 'next/link'
-import { ClockIcon, DocumentTextIcon, UserGroupIcon } from '@heroicons/react/24/outline'
+import { ClockIcon, DocumentTextIcon, UserGroupIcon } from '@/lib/icons'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
 
 interface Activity {

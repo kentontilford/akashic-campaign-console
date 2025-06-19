@@ -8,7 +8,7 @@ import {
   XMarkIcon,
   ClockIcon,
   ChevronLeftIcon
-} from '@heroicons/react/24/outline'
+} from '@/lib/icons'
 import MessageActions from '@/components/messaging/MessageActions'
 import VersionComparison from '@/components/messaging/VersionComparison'
 

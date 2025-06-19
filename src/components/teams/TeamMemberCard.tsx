@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { UserRole } from '@prisma/client'
-import { EllipsisVerticalIcon, TrashIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
+import { EllipsisVerticalIcon, TrashIcon, ArrowPathIcon } from '@/lib/icons'
 import { Menu } from '@headlessui/react'
 import toast from 'react-hot-toast'
 

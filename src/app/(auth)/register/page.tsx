@@ -5,6 +5,9 @@ import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import toast from 'react-hot-toast'
+import { Logo } from '@/components/ui/Logo'
+import { MysticalInput, MysticalButton } from '@/components/ui'
+import { User, Mail, Lock, KeyRound } from 'lucide-react'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -71,7 +74,7 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed')
       }
 
-      toast.success('Account created successfully!')
+      toast.success('Your oracle account has been created!')
       
       // Automatically sign in the user
       const signInResult = await signIn('credentials', {
@@ -96,108 +99,114 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Create your account
+    <div className="min-h-screen flex items-center justify-center bg-white relative overflow-hidden">
+      {/* Mystical background effects */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 rounded-full bg-gradient-to-br from-blue-500/10 to-purple-500/10 blur-3xl animate-pulse" />
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-gradient-to-tr from-blue-500/10 to-purple-500/10 blur-3xl animate-pulse" />
+      </div>
+
+      <div className="relative z-10 max-w-md w-full space-y-8 p-8">
+        {/* Logo and Title */}
+        <div className="text-center">
+          <div className="flex justify-center mb-8">
+            <Logo variant="icon" theme="black" size="lg" showGlow />
+          </div>
+          <h2 className="text-3xl font-bold text-black">
+            Join the Oracle
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Or{' '}
-            <Link href="/login" className="font-medium text-akashic-primary hover:text-blue-700">
-              sign in to existing account
-            </Link>
+          <p className="mt-2 text-gray-600">
+            Gain access to mystical political intelligence
           </p>
         </div>
         
+        {/* Registration Form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Full Name
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                autoComplete="name"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-akashic-primary focus:border-akashic-primary focus:z-10 sm:text-sm"
-                placeholder="John Doe"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              />
-            </div>
+            <MysticalInput
+              id="name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              required
+              label="Full Name"
+              placeholder="John Doe"
+              icon={User}
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            />
             
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email Address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-akashic-primary focus:border-akashic-primary focus:z-10 sm:text-sm"
-                placeholder="john@example.com"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              />
-            </div>
+            <MysticalInput
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              label="Email Address"
+              placeholder="john@example.com"
+              icon={Mail}
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            />
             
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-akashic-primary focus:border-akashic-primary focus:z-10 sm:text-sm"
-                placeholder="Minimum 8 characters"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              />
-            </div>
+            <MysticalInput
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              label="Password"
+              placeholder="Minimum 8 characters"
+              icon={Lock}
+              hint="Must be at least 8 characters long"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+            />
             
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
-                Confirm Password
-              </label>
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                className="mt-1 appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-akashic-primary focus:border-akashic-primary focus:z-10 sm:text-sm"
-                placeholder="Re-enter your password"
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-              />
-            </div>
+            <MysticalInput
+              id="confirmPassword"
+              name="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              required
+              label="Confirm Password"
+              placeholder="Re-enter your password"
+              icon={KeyRound}
+              value={formData.confirmPassword}
+              onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+              error={formData.confirmPassword && formData.password !== formData.confirmPassword ? 'Passwords do not match' : undefined}
+            />
           </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-akashic-primary hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-akashic-primary disabled:opacity-50 disabled:cursor-not-allowed"
+          <MysticalButton
+            type="submit"
+            variant="primary"
+            size="lg"
+            className="w-full"
+            isLoading={isLoading}
+          >
+            {isLoading ? 'Creating your oracle account...' : 'Create Account'}
+          </MysticalButton>
+
+          <div className="text-center">
+            <span className="text-sm text-gray-600">
+              Already have an account?{' '}
+            </span>
+            <Link 
+              href="/login" 
+              className="text-sm font-medium text-black hover:text-blue-600 transition-colors"
             >
-              {isLoading ? 'Creating account...' : 'Create Account'}
-            </button>
+              Sign in
+            </Link>
           </div>
 
-          <div className="text-center text-sm text-gray-600">
+          <div className="text-center text-xs text-gray-500 px-8">
             By creating an account, you agree to our{' '}
-            <Link href="/terms" className="font-medium text-akashic-primary hover:text-blue-700">
+            <Link href="/terms" className="font-medium text-black hover:text-blue-600">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="/privacy" className="font-medium text-akashic-primary hover:text-blue-700">
+            <Link href="/privacy" className="font-medium text-black hover:text-blue-600">
               Privacy Policy
             </Link>
           </div>

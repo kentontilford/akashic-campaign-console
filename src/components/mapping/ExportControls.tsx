@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react'
 import html2canvas from 'html2canvas'
-import { ArrowDownTrayIcon, ShareIcon } from '@heroicons/react/24/outline'
+import { ArrowDownTrayIcon, ShareIcon } from '@/lib/icons'
 import { MapDataType, ElectionYear } from '@/types/mapping'
 import toast from 'react-hot-toast'
 

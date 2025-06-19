@@ -9,7 +9,7 @@ import {
   XMarkIcon, 
   ChatBubbleLeftIcon,
   EyeIcon 
-} from '@heroicons/react/24/outline'
+} from '@/lib/icons'
 
 interface ApprovalCardProps {
   message: any

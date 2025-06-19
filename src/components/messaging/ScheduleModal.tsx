@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { CalendarIcon, ClockIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { CalendarIcon, ClockIcon, XMarkIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 
 interface ScheduleModalProps {

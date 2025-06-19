@@ -1,7 +1,7 @@
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
-import { CalendarIcon, UserGroupIcon } from '@heroicons/react/24/outline'
+import { CalendarIcon, UserGroupIcon } from '@/lib/icons'
 import { cn } from '@/lib/utils'
 
 interface MessageCardProps {

@@ -12,7 +12,7 @@ import {
   BellIcon,
   LockClosedIcon,
   TrashIcon
-} from '@heroicons/react/24/outline'
+} from '@/lib/icons'
 
 interface CampaignSettings {
   notifications: {

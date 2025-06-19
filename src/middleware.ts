@@ -3,6 +3,9 @@ import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
 // Rate limiting configuration
+// WARNING: In-memory rate limiting won't work properly on Vercel (serverless)
+// Each function invocation gets its own memory space
+// For production on Vercel, use Vercel KV, Upstash Redis, or disable rate limiting
 const RATE_LIMITING_ENABLED = process.env.DISABLE_RATE_LIMITING !== 'true'
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
 
@@ -128,7 +131,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // Protected routes that require authentication
-  const protectedPaths = ['/dashboard', '/campaigns', '/messages', '/approvals', '/settings']
+  const protectedPaths = ['/dashboard', '/campaigns', '/messages', '/approvals', '/settings', '/onboarding']
   const isProtectedPath = protectedPaths.some(path => pathname.startsWith(path))
 
   if (isProtectedPath) {

@@ -1,4 +1,4 @@
-import PageLayout from '@/components/layout/PageLayout'
+import { AppLayout } from '@/components/layout/AppLayout'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
@@ -14,5 +14,5 @@ export default async function DashboardLayout({
     redirect('/login')
   }
 
-  return <PageLayout>{children}</PageLayout>
+  return <AppLayout>{children}</AppLayout>
 }

@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { RocketLaunchIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { RocketLaunchIcon, XMarkIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 import { Platform } from '@prisma/client'
 

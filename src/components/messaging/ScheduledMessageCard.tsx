@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ClockIcon, XMarkIcon, RocketLaunchIcon } from '@heroicons/react/24/outline'
+import { ClockIcon, XMarkIcon, RocketLaunchIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 
 interface ScheduledMessageCardProps {

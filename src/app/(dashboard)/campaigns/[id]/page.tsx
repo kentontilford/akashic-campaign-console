@@ -8,8 +8,9 @@ import {
   EnvelopeIcon, 
   ChartBarIcon,
   CogIcon,
-  PlusIcon 
-} from '@heroicons/react/24/outline'
+  PlusIcon,
+  UsersIcon
+} from '@/lib/icons'
 
 async function getCampaign(campaignId: string, userId: string) {
   const member = await prisma.campaignMember.findFirst({
@@ -83,6 +84,24 @@ export default async function CampaignDetailPage({
       href: `/messages/new?campaignId=${campaign.id}`,
       icon: EnvelopeIcon,
       color: 'bg-akashic-primary'
+    },
+    {
+      name: 'Communication Hub',
+      href: `/campaigns/${campaign.id}/communications`,
+      icon: EnvelopeIcon,
+      color: 'bg-indigo-600'
+    },
+    {
+      name: 'Voter CRM',
+      href: `/campaigns/${campaign.id}/voters`,
+      icon: UsersIcon,
+      color: 'bg-purple-600'
+    },
+    {
+      name: 'Volunteers',
+      href: `/campaigns/${campaign.id}/volunteers`,
+      icon: UserGroupIcon,
+      color: 'bg-green-600'
     },
     {
       name: 'View Analytics',

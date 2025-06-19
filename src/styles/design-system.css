@@ -1,0 +1,443 @@
+/* Akashic Intelligence Design System */
+
+:root {
+  /* Core Foundation - Black & White Base */
+  --ai-black: #000000;            /* Pure black */
+  --ai-white: #ffffff;            /* Pure white */
+  --ai-background: #ffffff;       /* White background */
+  --ai-surface: #ffffff;          /* White surface */
+  --ai-border: #e5e7eb;           /* Subtle gray borders */
+
+  /* Text Hierarchy - Black & Gray */
+  --ai-text-primary: #000000;     /* Black primary text */
+  --ai-text-secondary: #374151;   /* Dark gray secondary */
+  --ai-text-muted: #6b7280;       /* Muted gray text */
+
+  /* Mystical Blue Glow Effects ONLY */
+  --ai-glow-blue: #3b82f6;        /* Blue for glow effects */
+  --ai-glow-blue-light: #60a5fa;  /* Lighter blue glow */
+  --ai-glow-blue-dark: #2563eb;   /* Darker blue glow */
+
+  /* Accent Colors (Minimal Use) */
+  --ai-success: #10b981;          /* Green for success states */
+  --ai-warning: #f59e0b;          /* Amber for warnings */
+  --ai-error: #ef4444;            /* Red for errors */
+
+  /* Font Stack - Clean, Professional */
+  --ai-font-primary: 'Inter', 'Helvetica Neue', 'Helvetica', 'Aptos', sans-serif;
+  --ai-font-mono: 'JetBrains Mono', 'Courier New', monospace;
+
+  /* Type Scale */
+  --ai-text-xs: 0.75rem;    /* 12px - small labels */
+  --ai-text-sm: 0.875rem;   /* 14px - body text */
+  --ai-text-base: 1rem;     /* 16px - default */
+  --ai-text-lg: 1.125rem;   /* 18px - emphasized */
+  --ai-text-xl: 1.25rem;    /* 20px - subheadings */
+  --ai-text-2xl: 1.5rem;    /* 24px - section headers */
+  --ai-text-3xl: 1.875rem;  /* 30px - page titles */
+  --ai-text-4xl: 2.25rem;   /* 36px - hero text */
+
+  /* Font Weights */
+  --ai-font-normal: 400;
+  --ai-font-medium: 500;
+  --ai-font-semibold: 600;
+  --ai-font-bold: 700;
+
+  /* 4px Grid-Based Spacing */
+  --ai-space-1: 0.25rem;   /* 4px */
+  --ai-space-2: 0.5rem;    /* 8px */
+  --ai-space-3: 0.75rem;   /* 12px */
+  --ai-space-4: 1rem;      /* 16px */
+  --ai-space-6: 1.5rem;    /* 24px */
+  --ai-space-8: 2rem;      /* 32px */
+  --ai-space-12: 3rem;     /* 48px */
+  --ai-space-16: 4rem;     /* 64px */
+
+  /* Border Radius - Smooth, Modern */
+  --ai-radius-sm: 0.25rem;    /* 4px - small elements */
+  --ai-radius-md: 0.5rem;     /* 8px - buttons, cards */
+  --ai-radius-lg: 0.75rem;    /* 12px - large cards */
+  --ai-radius-xl: 1rem;       /* 16px - modals */
+  --ai-radius-full: 9999px;   /* pills, badges */
+
+  /* Shadows */
+  --ai-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --ai-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --ai-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+  --ai-shadow-glow-sm: 0 0 15px rgba(59, 130, 246, 0.4);
+  --ai-shadow-glow-md: 0 0 20px rgba(59, 130, 246, 0.6);
+  --ai-shadow-glow-lg: 0 0 25px rgba(59, 130, 246, 0.8);
+
+  /* Z-index Scale */
+  --ai-z-base: 0;
+  --ai-z-dropdown: 10;
+  --ai-z-sticky: 20;
+  --ai-z-fixed: 30;
+  --ai-z-overlay: 40;
+  --ai-z-modal: 50;
+  --ai-z-popover: 60;
+  --ai-z-tooltip: 70;
+}
+
+/* Base Reset & Global Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--ai-font-primary);
+  font-size: var(--ai-text-base);
+  font-weight: var(--ai-font-normal);
+  line-height: 1.5;
+  color: var(--ai-text-primary);
+  background-color: var(--ai-background);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: var(--ai-font-bold);
+  line-height: 1.2;
+  color: var(--ai-text-primary);
+}
+
+h1 {
+  font-size: var(--ai-text-3xl);
+  font-weight: var(--ai-font-bold);
+  margin-bottom: var(--ai-space-4);
+}
+
+h2 {
+  font-size: var(--ai-text-2xl);
+  font-weight: var(--ai-font-semibold);
+  margin-bottom: var(--ai-space-3);
+}
+
+h3 {
+  font-size: var(--ai-text-xl);
+  font-weight: var(--ai-font-medium);
+  margin-bottom: var(--ai-space-2);
+}
+
+p {
+  margin: 0 0 var(--ai-space-4) 0;
+  line-height: 1.6;
+}
+
+/* Links */
+a {
+  color: var(--ai-text-primary);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+a:hover {
+  text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+/* Primary Button - Black with Blue Glow */
+.btn-primary {
+  background: var(--ai-black);
+  border: 1px solid var(--ai-black);
+  border-radius: var(--ai-radius-md);
+  padding: 12px 24px;
+  font-weight: var(--ai-font-semibold);
+  font-size: var(--ai-text-base);
+  color: var(--ai-white);
+  box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover {
+  box-shadow: var(--ai-shadow-glow-md);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Secondary Button - White with Black Border and Blue Glow */
+.btn-secondary {
+  background: var(--ai-white);
+  border: 2px solid var(--ai-black);
+  border-radius: var(--ai-radius-md);
+  padding: 10px 22px;
+  font-weight: var(--ai-font-medium);
+  font-size: var(--ai-text-base);
+  color: var(--ai-black);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.btn-secondary:hover {
+  box-shadow: var(--ai-shadow-glow-sm);
+}
+
+/* Main Content Cards - Clean White with Subtle Borders */
+.card {
+  background: var(--ai-white);
+  border: 1px solid var(--ai-border);
+  border-radius: var(--ai-radius-lg);
+  padding: var(--ai-space-6);
+  box-shadow: var(--ai-shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: var(--ai-shadow-md), 0 0 0 1px rgba(59, 130, 246, 0.3);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Dashboard Stats Cards - White with Blue Glow Accent */
+.stat-card {
+  background: var(--ai-white);
+  border: 1px solid var(--ai-border);
+  border-left: 4px solid var(--ai-black);
+  border-radius: var(--ai-radius-md);
+  padding: var(--ai-space-4);
+  transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+  box-shadow: var(--ai-shadow-glow-sm);
+}
+
+/* Glowing Elements for AI/Intelligence Features - Black/White with Blue Glow */
+.ai-element {
+  position: relative;
+  background: var(--ai-white);
+  border: 2px solid var(--ai-black);
+  border-radius: var(--ai-radius-md);
+  padding: var(--ai-space-4);
+  transition: all 0.3s ease;
+}
+
+.ai-element:hover {
+  box-shadow: var(--ai-shadow-glow-lg);
+  border-color: rgba(59, 130, 246, 0.8);
+}
+
+/* Mystical Glow Border Effect */
+.mystical-border {
+  position: relative;
+  background: var(--ai-white);
+  border: 1px solid var(--ai-border);
+  border-radius: var(--ai-radius-md);
+  padding: var(--ai-space-4);
+}
+
+.mystical-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, 
+    rgba(59, 130, 246, 0.8), 
+    rgba(96, 165, 250, 0.6),
+    rgba(59, 130, 246, 0.8)
+  );
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+.mystical-border:hover::before {
+  opacity: 1;
+}
+
+/* Form Elements */
+.form-input {
+  width: 100%;
+  border: 2px solid var(--ai-border);
+  border-radius: var(--ai-radius-md);
+  padding: 12px 16px;
+  font-family: var(--ai-font-primary);
+  font-size: var(--ai-text-base);
+  transition: border-color 0.2s ease;
+  background: var(--ai-white);
+  color: var(--ai-text-primary);
+}
+
+.form-input:focus {
+  border-color: var(--ai-black);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+}
+
+/* Akashic "Consulting the Records" Loader - Black text with Blue Glow */
+.akashic-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-style: italic;
+  color: var(--ai-black);
+  text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+  50% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.8); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s linear infinite;
+}
+
+/* Mystical Glow Effects */
+.mystical-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.mystical-glow::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(59, 130, 246, 0.4), 
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.mystical-glow:hover::after {
+  left: 100%;
+}
+
+/* Layout System */
+.app-container {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: 100vh;
+  background: var(--ai-background);
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.page-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--ai-space-8);
+}
+
+/* Grid System */
+.grid {
+  display: grid;
+  gap: var(--ai-space-6);
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-cols-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.grid-cols-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .app-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .grid-cols-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .grid-cols-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .grid-cols-2,
+  .grid-cols-3,
+  .grid-cols-4 {
+    grid-template-columns: 1fr;
+  }
+  
+  .page-content {
+    padding: var(--ai-space-4);
+  }
+}
+
+/* Utility Classes */
+.text-muted {
+  color: var(--ai-text-muted);
+}
+
+.text-sm {
+  font-size: var(--ai-text-sm);
+}
+
+.font-medium {
+  font-weight: var(--ai-font-medium);
+}
+
+.font-semibold {
+  font-weight: var(--ai-font-semibold);
+}
+
+.font-bold {
+  font-weight: var(--ai-font-bold);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--ai-background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--ai-border);
+  border-radius: var(--ai-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--ai-text-muted);
+}

@@ -13,7 +13,7 @@ import {
   TrashIcon,
   PencilIcon,
   ArrowPathIcon
-} from '@heroicons/react/24/outline'
+} from '@/lib/icons'
 
 interface Activity {
   id: string

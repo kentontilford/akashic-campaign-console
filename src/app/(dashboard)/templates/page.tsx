@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
-import { PlusIcon, DocumentTextIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, DocumentTextIcon } from '@/lib/icons'
 import TemplateCard from '@/components/templates/TemplateCard'
 
 async function getTemplates(userId: string) {

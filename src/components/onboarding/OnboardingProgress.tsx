@@ -1,6 +1,6 @@
 'use client'
 
-import { CheckIcon } from '@heroicons/react/24/solid'
+import { CheckIcon } from '@/lib/icons'
 
 interface Step {
   id: string

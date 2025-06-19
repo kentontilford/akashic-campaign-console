@@ -94,6 +94,22 @@ model User {
   approvals       Approval[]
   activities      Activity[]
   templates       MessageTemplate[]
+  voterContacts   VoterContact[]
+  voterTags       VoterTag[]
+  voterNotes      VoterNote[]
+  voterImports    VoterImport[]
+  volunteers      Volunteer[]
+  eventsHosted    Event[]          @relation("EventHost")
+  eventsCreated   Event[]          @relation("EventCreator")
+  volunteerComms  VolunteerCommunication[]
+  trainings       VolunteerTraining[]
+  
+  // Communication Hub relations
+  communicationCampaignsCreated CommunicationCampaign[] @relation("CommCreator")
+  communicationCampaignsApproved CommunicationCampaign[] @relation("CommApprover")
+  communicationTemplates CommunicationTemplate[]
+  audienceSegments AudienceSegment[]
+  unsubscribes Unsubscribe[]
 }
 
 model VerificationToken {
@@ -131,6 +147,24 @@ model Campaign {
   teams            Team[]
   activities       Activity[]
   templates        MessageTemplate[]
+  voters           Voter[]
+  voterContacts    VoterContact[]
+  voterImports     VoterImport[]
+  volunteers       Volunteer[]
+  volunteerActivities VolunteerActivity[]
+  events           Event[]
+  volunteerTeams   VolunteerTeam[]
+  canvassAssignments CanvassAssignment[]
+  phoneBankSessions PhoneBankSession[]
+  volunteerComms   VolunteerCommunication[]
+  
+  // Communication Hub relations
+  communicationCampaigns CommunicationCampaign[]
+  communicationTemplates CommunicationTemplate[]
+  audienceSegments AudienceSegment[]
+  unsubscribeGroups UnsubscribeGroup[]
+  unsubscribes Unsubscribe[]
+  communicationProviders CommunicationProvider[]
 }
 
 model CampaignMember {
@@ -331,4 +365,920 @@ model CountyDemographic {
   @@unique([countyFips, dataYear])
   @@index([countyFips])
   @@index([dataYear])
+}
+
+// ===== VOTER CRM MODELS =====
+
+model Voter {
+  id                  String            @id @default(cuid())
+  
+  // State voter identification
+  stateVoterId        String            @unique
+  countyVoterId       String?
+  precinctId          String?
+  
+  // Basic information
+  firstName           String
+  middleName          String?
+  lastName            String
+  nameSuffix          String?
+  namePrefix          String?
+  
+  // Contact information
+  phone               String?
+  phoneType           String?           // MOBILE, LANDLINE, VOIP
+  email               String?
+  emailDeliverable    Boolean           @default(true)
+  
+  // Residence address
+  resAddress1         String
+  resAddress2         String?
+  resCity             String
+  resState            String            @db.VarChar(2)
+  resZip              String            @db.VarChar(10)
+  resCounty           String?
+  resLatitude         Decimal?          @db.Decimal(10, 8)
+  resLongitude        Decimal?          @db.Decimal(11, 8)
+  
+  // Mailing address (if different)
+  mailAddress1        String?
+  mailAddress2        String?
+  mailCity            String?
+  mailState           String?           @db.VarChar(2)
+  mailZip             String?           @db.VarChar(10)
+  
+  // Demographics
+  birthYear           Int?
+  age                 Int?
+  gender              String?           @db.VarChar(1)
+  
+  // Registration information
+  registrationDate    DateTime?
+  registrationStatus  String            // ACTIVE, INACTIVE, PURGED
+  partyAffiliation    String?           // DEM, REP, IND, etc.
+  
+  // Districts
+  congressionalDist   String?
+  stateSenDist        String?
+  stateHouseDist      String?
+  countyCommDist      String?
+  cityCouncilDist     String?
+  schoolDist          String?
+  
+  // Enhanced data (from vendors)
+  modeledParty        String?           // Likely party if IND
+  modeledTurnout      Int?              // 0-100 likelihood
+  modeledSupport      Int?              // 0-100 support score
+  
+  // Campaign data
+  supportLevel        String?           // STRONG_SUPPORT, LEAN_SUPPORT, UNDECIDED, LEAN_OPPOSE, STRONG_OPPOSE
+  volunteerStatus     Boolean           @default(false)
+  donorStatus         Boolean           @default(false)
+  doNotContact        Boolean           @default(false)
+  
+  // Metadata
+  dataSource          String            // STATE_FILE, L2, NATIONBUILDER, etc.
+  lastUpdated         DateTime          @default(now())
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  
+  // Relations
+  votingHistory       VotingHistory[]
+  contactHistory      VoterContact[]
+  tags                VoterTag[]
+  notes               VoterNote[]
+  phoneBankContacts   PhoneBankContact[]
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  campaignId          String
+  
+  @@index([stateVoterId])
+  @@index([lastName, firstName])
+  @@index([resZip])
+  @@index([partyAffiliation])
+  @@index([campaignId, supportLevel])
+  @@index([campaignId, resCity])
+}
+
+model VotingHistory {
+  id                  String            @id @default(cuid())
+  voterId             String
+  electionDate        DateTime
+  electionType        String            // PRIMARY, GENERAL, SPECIAL, MUNICIPAL
+  electionName        String
+  votingMethod        String?           // IN_PERSON, ABSENTEE, EARLY, PROVISIONAL
+  partyPrimary        String?           // For primary elections
+  
+  voter               Voter             @relation(fields: [voterId], references: [id], onDelete: Cascade)
+  
+  @@unique([voterId, electionDate])
+  @@index([voterId])
+  @@index([electionDate])
+}
+
+model VoterContact {
+  id                  String            @id @default(cuid())
+  voterId             String
+  campaignId          String
+  userId              String            // Who made the contact
+  
+  contactType         String            // CANVASS, PHONE, TEXT, EMAIL, MAIL
+  contactDate         DateTime          @default(now())
+  result              String            // CONTACTED, NOT_HOME, REFUSED, MOVED, etc.
+  
+  // Contact details
+  supportLevel        String?           // Updated support level from contact
+  issuesCareAbout     String[]          // Array of issues discussed
+  notes               String?           @db.Text
+  followUpNeeded      Boolean           @default(false)
+  followUpDate        DateTime?
+  
+  voter               Voter             @relation(fields: [voterId], references: [id], onDelete: Cascade)
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  user                User              @relation(fields: [userId], references: [id])
+  
+  @@index([voterId, contactDate])
+  @@index([campaignId, contactDate])
+  @@index([userId, contactDate])
+}
+
+model VoterTag {
+  id                  String            @id @default(cuid())
+  voterId             String
+  tag                 String
+  createdAt           DateTime          @default(now())
+  createdById         String
+  
+  voter               Voter             @relation(fields: [voterId], references: [id], onDelete: Cascade)
+  createdBy           User              @relation(fields: [createdById], references: [id])
+  
+  @@unique([voterId, tag])
+  @@index([tag])
+}
+
+model VoterNote {
+  id                  String            @id @default(cuid())
+  voterId             String
+  note                String            @db.Text
+  createdAt           DateTime          @default(now())
+  createdById         String
+  
+  voter               Voter             @relation(fields: [voterId], references: [id], onDelete: Cascade)
+  createdBy           User              @relation(fields: [createdById], references: [id])
+  
+  @@index([voterId, createdAt])
+}
+
+model VoterImport {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  fileName            String
+  fileSize            Int
+  recordCount         Int
+  successCount        Int               @default(0)
+  errorCount          Int               @default(0)
+  status              String            // PENDING, PROCESSING, COMPLETED, FAILED
+  errorLog            Json?             // Array of error messages
+  startedAt           DateTime?
+  completedAt         DateTime?
+  createdAt           DateTime          @default(now())
+  createdById         String
+  
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  createdBy           User              @relation(fields: [createdById], references: [id])
+  
+  @@index([campaignId, createdAt])
+}
+
+// ===== CAMPAIGN/VOLUNTEER CRM MODELS =====
+
+model Volunteer {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  
+  // Basic Information
+  firstName           String
+  lastName            String
+  preferredName       String?
+  email               String
+  phone               String
+  phoneType           String?           // MOBILE, HOME, WORK
+  
+  // Address
+  address1            String
+  address2            String?
+  city                String
+  state               String            @db.VarChar(2)
+  zip                 String            @db.VarChar(10)
+  
+  // Demographics
+  dateOfBirth         DateTime?
+  gender              String?
+  occupation          String?
+  employer            String?
+  
+  // Volunteer Information
+  status              String            @default("ACTIVE") // ACTIVE, INACTIVE, BLACKLISTED
+  source              String            // WEBSITE, EVENT, REFERRAL, WALKIN, IMPORT
+  joinDate            DateTime          @default(now())
+  
+  // Skills and Interests
+  skills              String[]          // CANVASSING, PHONE_BANKING, DATA_ENTRY, etc.
+  languages           String[]          @default(["English"])
+  hasVehicle          Boolean           @default(false)
+  canHost             Boolean           @default(false)
+  
+  // Availability
+  availability        Json?             // Structured availability data
+  preferredTasks      String[]
+  maxHoursPerWeek     Int?
+  
+  // Background Check
+  backgroundCheckStatus String?         // PENDING, CLEARED, FAILED
+  backgroundCheckDate DateTime?
+  
+  // Emergency Contact
+  emergencyName       String?
+  emergencyPhone      String?
+  emergencyRelation   String?
+  
+  // Internal Notes
+  notes               String?           @db.Text
+  flags               String[]          // VIP, TEAM_LEAD, UNRELIABLE, etc.
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  createdById         String
+  
+  // Relations
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  createdBy           User              @relation(fields: [createdById], references: [id])
+  shifts              VolunteerShift[]
+  activities          VolunteerActivity[]
+  eventAttendance     EventVolunteer[]
+  teamMemberships     VolunteerTeam[]  @relation("TeamMembers")
+  teamsLed            VolunteerTeam[]  @relation("TeamLeader")
+  assignments         CanvassAssignment[]
+  phoneContacts       PhoneBankContact[]
+  trainings           VolunteerTraining[]
+  
+  @@unique([campaignId, email])
+  @@index([campaignId, status])
+  @@index([campaignId, city])
+  @@index([lastName, firstName])
+}
+
+model VolunteerShift {
+  id                  String            @id @default(cuid())
+  volunteerId         String
+  eventId             String?
+  
+  // Shift Details
+  role                String            // CANVASSER, PHONE_BANKER, OFFICE_HELP, etc.
+  date                DateTime
+  startTime           DateTime
+  endTime             DateTime
+  location            String?
+  
+  // Status
+  status              String            // SCHEDULED, CONFIRMED, COMPLETED, NO_SHOW, CANCELLED
+  checkedIn           DateTime?
+  checkedOut          DateTime?
+  
+  // Performance
+  hoursWorked         Decimal?          @db.Decimal(4, 2)
+  tasksCompleted      Int?
+  performance         Json?             // Role-specific metrics
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  
+  volunteer           Volunteer         @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  event               Event?            @relation(fields: [eventId], references: [id])
+  
+  @@index([volunteerId, date])
+  @@index([eventId, date])
+  @@index([date, status])
+}
+
+model VolunteerActivity {
+  id                  String            @id @default(cuid())
+  volunteerId         String
+  campaignId          String
+  
+  // Activity Details
+  type                String            // DOORS_KNOCKED, CALLS_MADE, TEXTS_SENT, DATA_ENTERED, etc.
+  date                DateTime          @default(now())
+  quantity            Int               @default(1)
+  duration            Int?              // Minutes
+  
+  // Context
+  eventId             String?
+  teamId              String?
+  location            String?
+  
+  // Results
+  results             Json?             // Activity-specific results
+  
+  volunteer           Volunteer         @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  event               Event?            @relation(fields: [eventId], references: [id])
+  team                VolunteerTeam?    @relation(fields: [teamId], references: [id])
+  
+  @@index([volunteerId, date])
+  @@index([campaignId, type, date])
+}
+
+model Event {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  
+  // Event Details
+  name                String
+  type                String            // CANVASS, PHONE_BANK, RALLY, FUNDRAISER, TRAINING, MEETING
+  description         String?           @db.Text
+  
+  // Schedule
+  date                DateTime
+  startTime           DateTime
+  endTime             DateTime
+  setupTime           DateTime?
+  
+  // Location
+  locationName        String
+  address1            String
+  address2            String?
+  city                String
+  state               String            @db.VarChar(2)
+  zip                 String            @db.VarChar(10)
+  
+  // Virtual Event Info
+  isVirtual           Boolean           @default(false)
+  virtualLink         String?
+  virtualInstructions String?           @db.Text
+  
+  // Capacity
+  capacity            Int?
+  minVolunteers       Int?
+  maxVolunteers       Int?
+  
+  // Requirements
+  skillsRequired      String[]
+  trainingRequired    Boolean           @default(false)
+  minimumAge          Int?
+  
+  // Status
+  status              String            @default("SCHEDULED") // DRAFT, SCHEDULED, IN_PROGRESS, COMPLETED, CANCELLED
+  isPublic            Boolean           @default(false)
+  
+  // Goals
+  goals               Json?             // Event-specific goals
+  
+  // Contact
+  hostId              String
+  contactPhone        String?
+  contactEmail        String?
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  createdById         String
+  
+  // Relations
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  host                User              @relation("EventHost", fields: [hostId], references: [id])
+  createdBy           User              @relation("EventCreator", fields: [createdById], references: [id])
+  volunteers          EventVolunteer[]
+  shifts              VolunteerShift[]
+  activities          VolunteerActivity[]
+  materials           EventMaterial[]
+  
+  @@index([campaignId, date])
+  @@index([campaignId, type])
+  @@index([date, status])
+}
+
+model EventVolunteer {
+  id                  String            @id @default(cuid())
+  eventId             String
+  volunteerId         String
+  
+  // RSVP Status
+  status              String            // INVITED, CONFIRMED, TENTATIVE, DECLINED, ATTENDED, NO_SHOW
+  rsvpDate            DateTime?
+  attendedDate        DateTime?
+  
+  // Role
+  role                String?           // PARTICIPANT, TEAM_LEAD, COORDINATOR
+  team                String?
+  
+  // Check-in
+  checkedIn           DateTime?
+  checkedOut          DateTime?
+  
+  // Notes
+  notes               String?
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  
+  event               Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  volunteer           Volunteer         @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  
+  @@unique([eventId, volunteerId])
+  @@index([eventId, status])
+  @@index([volunteerId])
+}
+
+model VolunteerTeam {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  
+  // Team Details
+  name                String
+  type                String            // CANVASS, PHONE_BANK, OFFICE, SPECIAL_PROJECT
+  description         String?
+  
+  // Leadership
+  leaderId            String
+  deputyId            String?
+  
+  // Status
+  status              String            @default("ACTIVE") // ACTIVE, INACTIVE
+  
+  // Goals
+  weeklyGoals         Json?
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  leader              Volunteer         @relation("TeamLeader", fields: [leaderId], references: [id])
+  members             Volunteer[]       @relation("TeamMembers")
+  activities          VolunteerActivity[]
+  
+  @@index([campaignId, status])
+}
+
+model CanvassAssignment {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  volunteerId         String
+  
+  // Assignment Details
+  date                DateTime
+  walkListId          String
+  precinct            String
+  
+  // Territory
+  streets             String[]
+  houseNumbers        Json              // Start and end numbers
+  estimatedDoors      Int
+  
+  // Status
+  status              String            // ASSIGNED, IN_PROGRESS, COMPLETED, PARTIAL
+  startTime           DateTime?
+  endTime             DateTime?
+  
+  // Results
+  doorsKnocked        Int               @default(0)
+  contactsMade        Int               @default(0)
+  notHome             Int               @default(0)
+  refused             Int               @default(0)
+  
+  // Performance
+  completionRate      Decimal?          @db.Decimal(5, 2)
+  contactRate         Decimal?          @db.Decimal(5, 2)
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  volunteer           Volunteer         @relation(fields: [volunteerId], references: [id])
+  
+  @@index([campaignId, date])
+  @@index([volunteerId, date])
+  @@index([walkListId])
+}
+
+model PhoneBankSession {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  
+  // Session Details
+  name                String
+  date                DateTime
+  startTime           DateTime
+  endTime             DateTime
+  
+  // Script
+  scriptId            String?
+  script              String            @db.Text
+  
+  // Lists
+  voterListId         String?
+  totalNumbers        Int
+  
+  // Status
+  status              String            // SCHEDULED, ACTIVE, COMPLETED
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  contacts            PhoneBankContact[]
+  
+  @@index([campaignId, date])
+}
+
+model PhoneBankContact {
+  id                  String            @id @default(cuid())
+  sessionId           String
+  volunteerId         String
+  voterId             String?
+  
+  // Contact Info
+  phoneNumber         String
+  voterName           String?
+  
+  // Call Details
+  callTime            DateTime          @default(now())
+  duration            Int?              // Seconds
+  result              String            // CONTACTED, NO_ANSWER, BUSY, WRONG_NUMBER, etc.
+  
+  // Response
+  supportLevel        String?
+  issuesDiscussed     String[]
+  voteByMail          Boolean?
+  volunteerInterest   Boolean?
+  
+  // Notes
+  notes               String?
+  
+  session             PhoneBankSession  @relation(fields: [sessionId], references: [id])
+  volunteer           Volunteer         @relation(fields: [volunteerId], references: [id])
+  voter               Voter?            @relation(fields: [voterId], references: [id])
+  
+  @@index([sessionId, result])
+  @@index([volunteerId, callTime])
+}
+
+model VolunteerCommunication {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  
+  // Recipients
+  recipientType       String            // INDIVIDUAL, TEAM, SKILL_GROUP, ALL
+  recipientIds        String[]          // Volunteer IDs or team IDs
+  
+  // Message
+  type                String            // EMAIL, SMS, PUSH
+  subject             String?
+  content             String            @db.Text
+  
+  // Scheduling
+  scheduledFor        DateTime?
+  sentAt              DateTime?
+  
+  // Status
+  status              String            // DRAFT, SCHEDULED, SENT, FAILED
+  
+  // Tracking
+  delivered           Int               @default(0)
+  opened              Int               @default(0)
+  clicked             Int               @default(0)
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  createdById         String
+  
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  createdBy           User              @relation(fields: [createdById], references: [id])
+  
+  @@index([campaignId, status])
+  @@index([scheduledFor])
+}
+
+model VolunteerTraining {
+  id                  String            @id @default(cuid())
+  volunteerId         String
+  
+  // Training Details
+  type                String            // CANVASS, PHONE_BANK, LEADERSHIP, DATA_ENTRY
+  completedDate       DateTime
+  expiresDate         DateTime?
+  
+  // Certification
+  certified           Boolean           @default(false)
+  certifiedById       String?
+  
+  // Score
+  score               Decimal?          @db.Decimal(5, 2)
+  
+  volunteer           Volunteer         @relation(fields: [volunteerId], references: [id], onDelete: Cascade)
+  certifiedBy         User?             @relation(fields: [certifiedById], references: [id])
+  
+  @@unique([volunteerId, type])
+  @@index([type, completedDate])
+}
+
+model EventMaterial {
+  id                  String            @id @default(cuid())
+  eventId             String
+  
+  // Material Details
+  type                String            // WALK_LIST, SCRIPT, FLYER, SIGN, STICKER
+  name                String
+  quantity            Int
+  
+  // Status
+  ordered             Boolean           @default(false)
+  received            Boolean           @default(false)
+  
+  event               Event             @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  @@index([eventId])
+}
+
+// ===== COMMUNICATION HUB MODELS =====
+
+model CommunicationCampaign {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  
+  // Campaign Details
+  name                String
+  type                String            // EMAIL, SMS, ROBOCALL, DIRECT_MAIL
+  status              String            @default("DRAFT") // DRAFT, SCHEDULED, SENDING, SENT, PAUSED, CANCELLED
+  
+  // Audience
+  audienceType        String            // VOTERS, VOLUNTEERS, CUSTOM
+  audienceFilters     Json?             // Segmentation criteria
+  audienceCount       Int               @default(0)
+  
+  // Content
+  subject             String?           // For emails
+  preheader           String?           // Email preview text
+  content             String            @db.Text
+  templateId          String?
+  
+  // Personalization
+  usePersonalization  Boolean           @default(true)
+  mergeFields         String[]          // Available merge fields
+  
+  // Scheduling
+  scheduledFor        DateTime?
+  sendingStartedAt    DateTime?
+  sendingCompletedAt  DateTime?
+  
+  // Settings
+  fromName            String?
+  fromEmail           String?
+  replyToEmail        String?
+  unsubscribeGroupId  String?
+  testMode            Boolean           @default(false)
+  
+  // Tracking
+  sentCount           Int               @default(0)
+  deliveredCount      Int               @default(0)
+  openedCount         Int               @default(0)
+  clickedCount        Int               @default(0)
+  unsubscribedCount   Int               @default(0)
+  bouncedCount        Int               @default(0)
+  complaintCount      Int               @default(0)
+  
+  // Cost (for SMS/calls)
+  estimatedCost       Decimal?          @db.Decimal(10, 2)
+  actualCost          Decimal?          @db.Decimal(10, 2)
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  createdById         String
+  approvedById        String?
+  approvedAt          DateTime?
+  
+  // Relations
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  createdBy           User              @relation("CommCreator", fields: [createdById], references: [id])
+  approvedBy          User?             @relation("CommApprover", fields: [approvedById], references: [id])
+  template            CommunicationTemplate? @relation(fields: [templateId], references: [id])
+  messages            CommunicationMessage[]
+  segments            AudienceSegment[]
+  
+  @@index([campaignId, status])
+  @@index([scheduledFor])
+  @@index([type, status])
+}
+
+model CommunicationMessage {
+  id                  String            @id @default(cuid())
+  communicationId     String
+  
+  // Recipient
+  recipientType       String            // VOTER, VOLUNTEER
+  recipientId         String            // Voter or Volunteer ID
+  recipientEmail      String?
+  recipientPhone      String?
+  
+  // Content (personalized)
+  personalizedContent String?           @db.Text
+  
+  // Status
+  status              String            @default("PENDING") // PENDING, SENT, DELIVERED, OPENED, CLICKED, BOUNCED, FAILED, UNSUBSCRIBED
+  
+  // Timestamps
+  sentAt              DateTime?
+  deliveredAt         DateTime?
+  openedAt            DateTime?
+  firstClickedAt      DateTime?
+  unsubscribedAt      DateTime?
+  bouncedAt           DateTime?
+  
+  // Tracking
+  openCount           Int               @default(0)
+  clickCount          Int               @default(0)
+  clickedLinks        String[]
+  
+  // Error handling
+  failureReason       String?
+  retryCount          Int               @default(0)
+  lastRetryAt         DateTime?
+  
+  // Cost (for SMS)
+  cost                Decimal?          @db.Decimal(6, 4)
+  
+  // Provider data
+  providerId          String?           // SendGrid, Twilio message ID
+  providerStatus      String?
+  
+  communication       CommunicationCampaign @relation(fields: [communicationId], references: [id], onDelete: Cascade)
+  
+  @@index([communicationId, status])
+  @@index([recipientType, recipientId])
+  @@index([sentAt])
+}
+
+model CommunicationTemplate {
+  id                  String            @id @default(cuid())
+  campaignId          String?           // Null for global templates
+  
+  // Template Details
+  name                String
+  type                String            // EMAIL, SMS, SCRIPT
+  category            String            // FUNDRAISING, GOTV, EVENT, VOLUNTEER, GENERAL
+  
+  // Content
+  subject             String?
+  preheader           String?
+  content             String            @db.Text
+  
+  // Design
+  design              Json?             // For email builders
+  thumbnailUrl        String?
+  
+  // Settings
+  isActive            Boolean           @default(true)
+  isGlobal            Boolean           @default(false)
+  
+  // Usage
+  useCount            Int               @default(0)
+  lastUsedAt          DateTime?
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  createdById         String
+  
+  // Relations
+  campaign            Campaign?         @relation(fields: [campaignId], references: [id])
+  createdBy           User              @relation(fields: [createdById], references: [id])
+  communications      CommunicationCampaign[]
+  
+  @@index([campaignId, isActive])
+  @@index([type, category])
+}
+
+model AudienceSegment {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  communicationId     String?
+  
+  // Segment Details
+  name                String
+  description         String?
+  
+  // Criteria
+  audienceType        String            // VOTERS, VOLUNTEERS
+  filters             Json              // Complex filter criteria
+  
+  // Stats
+  memberCount         Int               @default(0)
+  lastCalculated      DateTime?
+  
+  // Settings
+  isDynamic           Boolean           @default(true) // Auto-update membership
+  isActive            Boolean           @default(true)
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  createdById         String
+  
+  // Relations
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  communication       CommunicationCampaign? @relation(fields: [communicationId], references: [id])
+  createdBy           User              @relation(fields: [createdById], references: [id])
+  
+  @@index([campaignId, isActive])
+}
+
+model UnsubscribeGroup {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  
+  // Group Details
+  name                String
+  description         String
+  type                String            // EMAIL, SMS, ALL
+  
+  // Settings
+  isDefault           Boolean           @default(false)
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  unsubscribes        Unsubscribe[]
+  
+  @@index([campaignId])
+}
+
+model Unsubscribe {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  groupId             String
+  
+  // Recipient
+  recipientType       String            // VOTER, VOLUNTEER
+  recipientId         String
+  email               String?
+  phone               String?
+  
+  // Details
+  channel             String            // EMAIL, SMS, ALL
+  reason              String?
+  source              String            // LINK, COMPLAINT, ADMIN, IMPORT
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  createdById         String?
+  
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  group               UnsubscribeGroup  @relation(fields: [groupId], references: [id])
+  createdBy           User?             @relation(fields: [createdById], references: [id])
+  
+  @@unique([campaignId, recipientType, recipientId, channel])
+  @@index([email])
+  @@index([phone])
+}
+
+model CommunicationProvider {
+  id                  String            @id @default(cuid())
+  campaignId          String
+  
+  // Provider Details
+  type                String            // EMAIL, SMS
+  provider            String            // SENDGRID, MAILGUN, TWILIO, MESSAGEBIRD
+  
+  // Credentials (encrypted)
+  apiKey              String            @db.Text
+  apiSecret           String?           @db.Text
+  fromAddress         String?           // Default from email/phone
+  
+  // Settings
+  isActive            Boolean           @default(true)
+  isDefault           Boolean           @default(false)
+  
+  // Limits
+  dailyLimit          Int?
+  monthlyLimit        Int?
+  
+  // Usage
+  dailyUsage          Int               @default(0)
+  monthlyUsage        Int               @default(0)
+  lastResetDate       DateTime          @default(now())
+  
+  // Metadata
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  
+  campaign            Campaign          @relation(fields: [campaignId], references: [id])
+  
+  @@unique([campaignId, type, isDefault])
+  @@index([campaignId, isActive])
 }

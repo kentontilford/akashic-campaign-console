@@ -2,7 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
-import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline'
+import { CalendarIcon, ClockIcon } from '@/lib/icons'
 import ScheduledMessageCard from '@/components/messaging/ScheduledMessageCard'
 
 async function getScheduledMessages(userId: string) {

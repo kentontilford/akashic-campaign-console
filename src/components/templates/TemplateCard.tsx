@@ -8,7 +8,7 @@ import {
   PencilIcon, 
   TrashIcon,
   ChartBarIcon
-} from '@heroicons/react/24/outline'
+} from '@/lib/icons'
 import toast from 'react-hot-toast'
 
 interface TemplateCardProps {

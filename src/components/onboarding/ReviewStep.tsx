@@ -1,7 +1,7 @@
 'use client'
 
 import { CandidateProfile } from '@/types/campaign-profile'
-import { CheckCircleIcon } from '@heroicons/react/24/outline'
+import { CheckCircleIcon } from '@/lib/icons'
 
 interface ReviewStepProps {
   profile: CandidateProfile

@@ -8,7 +8,7 @@ import {
   TrashIcon,
   CalendarIcon,
   RocketLaunchIcon
-} from '@heroicons/react/24/outline'
+} from '@/lib/icons'
 import ScheduleModal from './ScheduleModal'
 import PublishModal from './PublishModal'
 import toast from 'react-hot-toast'

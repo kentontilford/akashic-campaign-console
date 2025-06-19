@@ -9,7 +9,7 @@ import {
   ArchiveBoxIcon,
   CheckCircleIcon,
   XCircleIcon
-} from '@heroicons/react/24/outline'
+} from '@/lib/icons'
 
 interface Message {
   id: string

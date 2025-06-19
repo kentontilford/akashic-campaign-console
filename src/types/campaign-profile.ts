@@ -11,6 +11,7 @@ export interface CandidateProfile {
     religion?: string
     languages: string[]
     photo?: string
+    personalStory?: string
   }
 
   // Political Background
@@ -31,6 +32,7 @@ export interface CandidateProfile {
       organization: string
       quote?: string
     }[]
+    whyRunning?: string
   }
 
   // Professional Background

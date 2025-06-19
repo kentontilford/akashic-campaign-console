@@ -2,21 +2,29 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
-import { StatsCard } from '@/components/dashboard/StatsCard'
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
-import { Button } from '@/components/ui/Button'
-import { Badge } from '@/components/ui/Badge'
-import ActivitySummary from '@/components/dashboard/ActivitySummary'
 import { 
-  UsersIcon, 
-  EnvelopeIcon, 
-  DocumentTextIcon, 
-  CheckCircleIcon,
-  PlusIcon 
-} from '@heroicons/react/24/outline'
+  MysticalButton, 
+  StatCard, 
+  AICard,
+  MysticalInfoCard,
+  MysticalCard 
+} from '@/components/ui'
+import { 
+  Users, 
+  MessageSquare, 
+  FileText, 
+  CheckCircle,
+  Plus,
+  TrendingUp,
+  Target,
+  Brain,
+  Zap
+} from 'lucide-react'
+import { CampaignHealthScore } from '@/components/dashboard/CampaignHealthScore'
+import { RecentActivityFeed } from '@/components/dashboard/RecentActivityFeed'
 
 async function getDashboardData(userId: string) {
-  const [campaigns, recentActivity, messageStats] = await Promise.all([
+  const [campaigns, recentActivity, messageStats, voterReach] = await Promise.all([
     prisma.campaignMember.findMany({
       where: { userId },
       include: {
@@ -57,110 +65,197 @@ async function getDashboardData(userId: string) {
         }
       },
       _count: true
-    })
+    }),
+    // Mock voter reach data - in real app, calculate from message views/engagement
+    Promise.resolve(125000)
   ])
 
-  return { campaigns, recentActivity, messageStats }
+  return { campaigns, recentActivity, messageStats, voterReach }
+}
+
+function calculateHealthScore(campaigns: any[], messageStats: any[]) {
+  // Mock health score calculation
+  const baseScore = 75
+  const campaignBonus = Math.min(campaigns.length * 5, 15)
+  const messageBonus = Math.min(messageStats.reduce((acc, s) => acc + s._count, 0) * 2, 10)
+  return Math.min(baseScore + campaignBonus + messageBonus, 100)
 }
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) return null
 
-  const { campaigns, recentActivity, messageStats } = await getDashboardData(session.user.id)
+  const { campaigns, recentActivity, messageStats, voterReach } = await getDashboardData(session.user.id)
 
   const stats = {
     totalCampaigns: campaigns.length,
     totalMessages: messageStats.reduce((acc, stat) => acc + stat._count, 0),
     draftMessages: messageStats.find(s => s.status === 'DRAFT')?._count || 0,
-    publishedMessages: messageStats.find(s => s.status === 'PUBLISHED')?._count || 0
+    publishedMessages: messageStats.find(s => s.status === 'PUBLISHED')?._count || 0,
+    voterReach,
+    healthScore: calculateHealthScore(campaigns, messageStats)
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Welcome back, {session.user.name || session.user.email}
+          <h1 className="text-3xl font-bold text-black">Campaign Command Center</h1>
+          <p className="mt-2 text-gray-600">
+            Welcome back, {session.user.name || session.user.email}. The oracle awaits your command.
           </p>
         </div>
-        <Button variant="primary" asChild>
+        <MysticalButton variant="primary" size="lg" asChild>
           <Link href="/messages/new">
-            <PlusIcon className="h-5 w-5 mr-2" />
-            Create Message
+            <span className="inline-flex items-center">
+              <Plus className="h-5 w-5 mr-2" />
+              Create Message
+            </span>
           </Link>
-        </Button>
+        </MysticalButton>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatsCard
+      {/* Campaign Health Score - Centerpiece */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <CampaignHealthScore 
+            score={stats.healthScore}
+            breakdown={{
+              messageEffectiveness: 85,
+              voterEngagement: 72,
+              campaignMomentum: 90,
+              historicalAlignment: 68
+            }}
+          />
+        </div>
+        
+        {/* Next Recommended Action */}
+        <AICard
+          title="Oracle's Guidance"
+          description="Recommended next action based on campaign analysis"
+          confidence={92}
+        >
+          <div className="space-y-3">
+            <MysticalInfoCard
+              icon={Target}
+              title="Target Youth Voters"
+              content="Historical patterns suggest focusing on college campuses could yield 15% higher engagement"
+              action={{
+                label: "Create Youth Message",
+                onClick: () => window.location.href = '/messages/new?audience=youth'
+              }}
+            />
+          </div>
+        </AICard>
+      </div>
+
+      {/* Key Metrics Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+        <StatCard
+          title="Total Reach"
+          value={stats.voterReach.toLocaleString()}
+          change="+12.5%"
+          trend="up"
+          icon={Users}
+        />
+        <StatCard
+          title="Message Effectiveness"
+          value="82%"
+          change="+5.2%"
+          trend="up"
+          icon={Brain}
+        />
+        <StatCard
+          title="Voter Persuasion Rate"
+          value="34%"
+          change="+2.1%"
+          trend="up"
+          icon={TrendingUp}
+        />
+        <StatCard
           title="Active Campaigns"
           value={stats.totalCampaigns}
-          icon={<UsersIcon className="h-6 w-6" />}
+          icon={Zap}
         />
-        <StatsCard
+        <StatCard
           title="Total Messages"
           value={stats.totalMessages}
-          icon={<EnvelopeIcon className="h-6 w-6" />}
+          icon={MessageSquare}
         />
-        <StatsCard
-          title="Draft Messages"
-          value={stats.draftMessages}
-          icon={<DocumentTextIcon className="h-6 w-6" />}
-        />
-        <StatsCard
-          title="Published"
-          value={stats.publishedMessages}
-          icon={<CheckCircleIcon className="h-6 w-6" />}
+        <StatCard
+          title="Historical Pattern Match"
+          value="76%"
+          change="-1.3%"
+          trend="down"
+          icon={FileText}
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
         {/* Active Campaigns */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Active Campaigns</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {campaigns.length > 0 ? (
-              <div className="space-y-3">
-                {campaigns.map(({ campaign, role }) => (
-                  <Link
-                    key={campaign.id}
-                    href={`/campaigns/${campaign.id}`}
-                    className="block p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-all hover:shadow-md"
-                  >
+        <MysticalCard>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-xl font-semibold text-black">Active Campaigns</h2>
+            <Link 
+              href="/campaigns" 
+              className="text-sm font-medium text-black hover:text-blue-600 transition-colors"
+            >
+              View all →
+            </Link>
+          </div>
+          
+          {campaigns.length > 0 ? (
+            <div className="space-y-3">
+              {campaigns.slice(0, 3).map(({ campaign, role }) => (
+                <Link
+                  key={campaign.id}
+                  href={`/campaigns/${campaign.id}`}
+                  className="block group"
+                >
+                  <div className="p-4 border border-gray-200 rounded-lg transition-all duration-200 group-hover:border-blue-500/50 group-hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-medium text-gray-900">{campaign.name}</h3>
-                        <p className="text-sm text-gray-500">{campaign.candidateName} • {campaign.office}</p>
+                        <h3 className="font-semibold text-black group-hover:text-blue-600 transition-colors">
+                          {campaign.name}
+                        </h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {campaign.candidateName} • {campaign.office}
+                        </p>
                       </div>
-                      <Badge variant="default" className="ml-2">
+                      <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded-full">
                         {role}
-                      </Badge>
+                      </span>
                     </div>
-                    <div className="mt-2 flex gap-4 text-sm text-gray-500">
-                      <span>{campaign._count.messages} messages</span>
-                      <span>{campaign._count.members} members</span>
+                    <div className="mt-3 flex gap-4 text-sm text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <MessageSquare className="h-4 w-4" />
+                        {campaign._count.messages} messages
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Users className="h-4 w-4" />
+                        {campaign._count.members} members
+                      </span>
                     </div>
-                  </Link>
-                ))}
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="h-8 w-8 text-gray-400" />
               </div>
-            ) : (
-              <div className="text-center py-8">
-                <p className="text-gray-500 mb-4">No campaigns yet</p>
-                <Button variant="primary" asChild>
-                  <Link href="/campaigns/new">Create Campaign</Link>
-                </Button>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+              <p className="text-gray-500 mb-4">No campaigns yet</p>
+              <MysticalButton variant="secondary" asChild>
+                <Link href="/campaigns/new">Create Your First Campaign</Link>
+              </MysticalButton>
+            </div>
+          )}
+        </MysticalCard>
 
-        {/* Recent Activity */}
-        <ActivitySummary activities={recentActivity} />
+        {/* Recent Activity Feed */}
+        <RecentActivityFeed activities={recentActivity as any} />
       </div>
     </div>
   )

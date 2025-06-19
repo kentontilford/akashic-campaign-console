@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { VersionControlEngine, VersionProfile } from '@/lib/version-control'
-import { SparklesIcon, ArrowsRightLeftIcon } from '@heroicons/react/24/outline'
+import { SparklesIcon, ArrowsRightLeftIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 
 interface VersionComparisonProps {

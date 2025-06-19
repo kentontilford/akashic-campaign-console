@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckIcon } from '@heroicons/react/24/outline'
+import { CheckIcon } from '@/lib/icons'
 
 interface CommunicationStyleData {
   speakingStyle: string

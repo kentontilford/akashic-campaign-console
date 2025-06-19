@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeftIcon } from '@heroicons/react/24/outline'
+import { ArrowLeftIcon } from '@/lib/icons'
 import PageLayout from '@/components/layout/PageLayout'
 import CountyElectionChart from '@/components/mapping/CountyElectionChart'
 import CountyDemographics from '@/components/mapping/CountyDemographics'

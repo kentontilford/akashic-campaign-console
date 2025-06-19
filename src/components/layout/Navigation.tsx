@@ -8,9 +8,7 @@ import { cn } from '@/lib/utils'
 import { Logo } from '@/components/ui/Logo'
 import { Button } from '@/components/ui/Button'
 import { motion, AnimatePresence } from 'framer-motion'
-const Bars3Icon = require('@heroicons/react/24/outline/Bars3Icon')
-const XMarkIcon = require('@heroicons/react/24/outline/XMarkIcon')
-const ChevronDownIcon = require('@heroicons/react/24/outline/ChevronDownIcon')
+import { Bars3Icon, XMarkIcon, ChevronDownIcon } from '@/lib/icons'
 import { Menu, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 import VersionSelector from '../version-control/VersionSelector'
@@ -39,6 +37,7 @@ export default function Navigation({ showVersionSelector }: NavigationProps) {
     { href: '/scheduled', label: 'Scheduled' },
     { href: '/approvals', label: 'Approvals' },
     { href: '/analytics', label: 'Analytics' },
+    { href: '/elections', label: 'Elections' },
     { href: '/activity', label: 'Activity' },
     { href: '/mapping', label: 'Election Mapping' },
   ]
@@ -63,7 +62,7 @@ export default function Navigation({ showVersionSelector }: NavigationProps) {
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <Link href="/dashboard" className="flex items-center">
-              <Logo size="sm" showText glow="subtle" />
+              <Logo size="sm" variant="horizontal" showGlow />
             </Link>
 
             {/* Desktop Navigation */}
@@ -166,7 +165,7 @@ export default function Navigation({ showVersionSelector }: NavigationProps) {
             />
             <div className="absolute right-0 top-0 h-full w-full max-w-sm bg-white shadow-xl">
               <div className="flex items-center justify-between p-6 border-b">
-                <Logo size="sm" showText />
+                <Logo size="sm" variant="horizontal" />
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2 rounded-lg hover:bg-gray-100"

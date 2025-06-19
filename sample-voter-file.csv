@@ -1,0 +1,11 @@
+state_voter_id,first_name,middle_name,last_name,name_suffix,res_address1,res_address2,res_city,res_state,res_zip,phone,phone_type,email,birth_year,age,gender,registration_date,registration_status,party_affiliation,congressional_dist,state_sen_dist,state_house_dist
+OH12345678,John,Michael,Smith,,123 Main St,,Columbus,OH,43215,614-555-0101,MOBILE,john.smith@email.com,1975,48,M,2000-03-15,ACTIVE,DEM,3,15,25
+OH12345679,Sarah,Lynn,Johnson,,456 Oak Ave,Apt 2B,Columbus,OH,43214,614-555-0102,LANDLINE,sarah.johnson@email.com,1982,41,F,2004-11-02,ACTIVE,REP,3,15,25
+OH12345680,Robert,,Williams,Jr,789 Elm Dr,,Columbus,OH,43213,614-555-0103,MOBILE,rwilliams@email.com,1990,33,M,2008-09-20,ACTIVE,IND,3,15,26
+OH12345681,Maria,Elena,Garcia,,321 Pine St,,Columbus,OH,43212,,,,1968,55,F,1995-06-10,ACTIVE,DEM,3,16,26
+OH12345682,James,David,Brown,,654 Maple Ln,,Columbus,OH,43211,614-555-0105,VOIP,jbrown@email.com,1958,65,M,1980-01-15,ACTIVE,REP,3,16,27
+OH12345683,Jennifer,Ann,Davis,,987 Cedar Rd,,Columbus,OH,43210,614-555-0106,MOBILE,,1985,38,F,2003-07-22,ACTIVE,IND,3,16,27
+OH12345684,Michael,,Jones,,147 Birch Way,,Columbus,OH,43209,614-555-0107,MOBILE,mjones@email.com,1970,53,M,1992-04-18,ACTIVE,DEM,3,17,28
+OH12345685,Linda,Marie,Miller,,258 Spruce Ct,,Columbus,OH,43208,,,,1995,28,F,2013-10-05,ACTIVE,GRN,3,17,28
+OH12345686,David,Paul,Wilson,III,369 Walnut St,Unit 5,Columbus,OH,43207,614-555-0109,LANDLINE,dwilson@email.com,1962,61,M,1985-12-20,INACTIVE,REP,3,17,29
+OH12345687,Susan,Elizabeth,Moore,,741 Hickory Pl,,Columbus,OH,43206,614-555-0110,MOBILE,smoore@email.com,1978,45,F,1998-08-30,ACTIVE,DEM,3,18,29

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { SparklesIcon } from '@heroicons/react/24/outline'
+import { SparklesIcon } from '@/lib/icons'
 import toast from 'react-hot-toast'
 
 interface AIAssistancePanelProps {

@@ -2,7 +2,7 @@
 
 import { Fragment, useState, useEffect } from 'react'
 import { Listbox, Transition } from '@headlessui/react'
-import { ChevronUpDownIcon, CheckIcon } from '@heroicons/react/20/solid'
+import { ChevronUpDownIcon, CheckIcon } from '@/lib/icons'
 import { VersionControlEngine, VersionProfile } from '@/lib/version-control'
 
 const profiles = VersionControlEngine.getDefaultProfiles()

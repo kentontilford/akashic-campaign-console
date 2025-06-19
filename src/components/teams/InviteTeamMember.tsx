@@ -2,7 +2,7 @@
 
 import { Fragment, useState } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { UserPlusIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { UserPlusIcon, XMarkIcon } from '@/lib/icons'
 import { UserRole } from '@prisma/client'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
