@@ -7,18 +7,24 @@ let pool: Pool | null = null
 
 export function getDirectPool() {
   if (!pool) {
-    const connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL || ''
+    let connectionString = process.env.DIRECT_URL || process.env.DATABASE_URL || ''
     
     if (!connectionString) {
       throw new Error('No database connection string found')
     }
     
-    // Parse the connection string to add SSL if needed
+    // For Supabase, ensure SSL mode is set
+    if (!connectionString.includes('sslmode=') && connectionString.includes('supabase')) {
+      connectionString += connectionString.includes('?') ? '&sslmode=require' : '?sslmode=require'
+    }
+    
     const isProduction = process.env.NODE_ENV === 'production'
     
     pool = new Pool({
       connectionString,
-      ssl: isProduction ? { rejectUnauthorized: false } : false,
+      ssl: isProduction ? { 
+        rejectUnauthorized: false
+      } : false,
       // Disable prepared statements for pgBouncer compatibility
       max: 1,
       idleTimeoutMillis: 0,
