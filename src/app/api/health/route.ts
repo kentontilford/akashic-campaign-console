@@ -16,6 +16,9 @@ export async function GET() {
     const healthStatus = {
       status: 'healthy',
       timestamp: new Date().toISOString(),
+      version: '1.0.2',
+      deployment: 'fixed',
+      buildId: process.env.VERCEL_GIT_COMMIT_SHA?.substring(0, 7) || 'local',
       services: {
         database: 'unknown',
         redis: 'unknown'
