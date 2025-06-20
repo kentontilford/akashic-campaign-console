@@ -1,25 +1,13 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "node scripts/test-build.js && node scripts/ensure-prisma.js && next build",
-  "installCommand": "npm install",
-  "functions": {
-    "src/app/api/**/*.ts": {
-      "maxDuration": 30
-    }
-  },
+  "buildCommand": "prisma generate && next build",
   "env": {
     "SKIP_ENV_VALIDATION": "1",
-    "SKIP_REDIS": "true",
-    "DISABLE_RATE_LIMITING": "true"
+    "NODE_OPTIONS": "--max-old-space-size=4096"
   },
   "build": {
     "env": {
       "SKIP_ENV_VALIDATION": "1",
-      "NODE_OPTIONS": "--max-old-space-size=8192",
-      "SKIP_REDIS": "true",
-      "DISABLE_RATE_LIMITING": "true"
+      "NODE_OPTIONS": "--max-old-space-size=4096"
     }
-  },
-  "regions": ["iad1"],
-  "trailingSlash": false
+  }
 }
