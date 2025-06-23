@@ -1,12 +1,5 @@
 {
-  "buildCommand": "npm run build",
   "env": {
     "SKIP_ENV_VALIDATION": "1"
-  },
-  "build": {
-    "env": {
-      "SKIP_ENV_VALIDATION": "1",
-      "NODE_OPTIONS": "--max-old-space-size=1536"
-    }
   }
 }

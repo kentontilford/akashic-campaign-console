@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/safe-prisma-generate.js && next build",
+    "build": "next build",
     "build:full": "prisma generate && next build",
     "build:vercel": "node scripts/build-vercel.js",
     "start": "next start",
