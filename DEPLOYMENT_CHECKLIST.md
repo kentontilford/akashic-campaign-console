@@ -18,6 +18,7 @@
 ### Build-Time Environment Variables
 - [ ] `SKIP_ENV_VALIDATION=1` - Set during build to skip environment validation
 - [ ] `NODE_ENV=production` - Set for production builds
+- [ ] `NODE_OPTIONS="--max-old-space-size=4096"` - **IMPORTANT for preventing build failures due to memory issues.** Set this in your Railway/Vercel build settings. Adjust memory (e.g., to `8192`) if 4096MB is insufficient. The build scripts (`scripts/build-vercel.js`) also attempt to set a default if this isn't provided by the platform.
 
 ## Railway Deployment Steps
 
@@ -89,19 +90,21 @@ railway run npm run prisma:seed
    - Ensure database is accessible from deployment
 
 2. **Build Failures**
-   - Set `SKIP_ENV_VALIDATION=1` during build
-   - Check Node.js version matches (20.x)
-   - Verify all dependencies are in package.json
+   - **Memory Issues:** Ensure `NODE_OPTIONS="--max-old-space-size=4096"` (or higher, e.g., `8192`) is set as a build-time environment variable in your deployment platform (Railway/Vercel). This is the most common cause of Next.js build failures in memory-constrained environments.
+   - Set `SKIP_ENV_VALIDATION=1` during build (usually handled by build scripts or `vercel.json`).
+   - Check Node.js version matches (e.g., 20.x as per `package.json` engines).
+   - Verify all dependencies are correctly listed in `package.json`.
+   - Ensure Prisma client generation (`prisma generate`) is succeeding. Build scripts have been updated to fail the build if this step doesn't complete.
 
 3. **Health Check Failures**
    - Application has 60-second startup grace period
    - Check logs: `railway logs`
    - Verify all required environment variables are set
 
-4. **Memory Issues**
-   - Dockerfile sets Node.js memory limit to 512MB
-   - Monitor memory usage in Railway dashboard
-   - Scale up if needed
+4. **Runtime Memory Issues** (Post-Deployment)
+   - The `ecosystem.config.js` (for PM2 deployments) has `max_memory_restart: '1G'`. Adjust if needed.
+   - For Railway/Vercel, monitor memory usage in the platform dashboard and scale up your instance/plan if necessary.
+   - **Build-time memory issues** are covered under "Build Failures" above (primarily solved by `NODE_OPTIONS`). The old note about Dockerfile setting 512MB might be outdated if not using a custom Dockerfile on Railway that imposes this.
 
 ### Useful Commands
 

@@ -23,7 +23,7 @@
     "build:production": "npm run prisma:generate && next build",
     "db:backup": "node scripts/db-backup.js",
     "db:restore": "node scripts/db-restore.js",
-    "postinstall": "echo 'Running postinstall...' && prisma generate || echo 'Prisma generate failed, continuing...'"
+    "postinstall": "echo 'Running postinstall...' && prisma generate"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",

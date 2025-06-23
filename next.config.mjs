@@ -3,7 +3,9 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
   eslint: {
-    // Temporarily disable ESLint during builds to fix deployment
+    // TODO: Address all ESLint issues to enable ESLint checks during build.
+    // Temporarily disable ESLint during builds to fix deployment.
+    // Run `npm run lint` to see issues.
     ignoreDuringBuilds: true,
   },
   experimental: {
@@ -24,6 +26,14 @@ const nextConfig = {
   // Vercel-specific optimizations
   poweredByHeader: false,
   compress: true,
+
+  // Optional: Further memory optimization for builds if NODE_OPTIONS is not enough.
+  // Uncomment and adjust as needed.
+  // productionBrowserSourceMaps: false, // Reduces memory by not generating browser source maps
+  // experimental: {
+  //   ...nextConfig.experimental, // Preserve other experimental flags
+  //   cpus: 2, // Limits the number of CPUs Next.js build can use. Adjust based on your build environment.
+  // },
 }
 
 export default nextConfig

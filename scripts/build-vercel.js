@@ -6,7 +6,11 @@ const path = require('path');
 
 console.log('🚀 Starting Vercel Build Process...');
 console.log('Node version:', process.version);
-console.log('Memory limit:', process.env.NODE_OPTIONS || 'default');
+
+// Determine NODE_OPTIONS: use existing if set, otherwise default to 4GB
+const nodeOptions = process.env.NODE_OPTIONS || '--max-old-space-size=4096';
+console.log('Effective Memory limit (NODE_OPTIONS):', nodeOptions);
+process.env.NODE_OPTIONS = nodeOptions; // Ensure it's set for child processes
 
 // Step 1: Check environment
 console.log('\n📋 Environment Check:');
@@ -56,19 +60,20 @@ try {
   console.log('✅ Prisma Client generated successfully');
 } catch (error) {
   console.error('❌ Prisma generation failed:', error.message);
-  // Continue anyway - the app might not need Prisma
-  console.log('⚠️  Continuing without Prisma client...');
+  console.error('Prisma client is essential for the application. Exiting build.');
+  process.exit(1);
 }
 
 // Step 4: Build Next.js
 console.log('\n🏗️  Building Next.js application...');
 try {
+  // NODE_OPTIONS is already set in process.env by this point
   execSync('npx next build', {
     stdio: 'inherit',
     env: {
-      ...process.env,
+      ...process.env, // Inherits current process.env, including potentially overridden NODE_OPTIONS
       SKIP_ENV_VALIDATION: '1',
-      NEXT_TELEMETRY_DISABLED: '1'
+      NEXT_TELEMETRY_DISABLED: '1',
     }
   });
   console.log('\n✅ Build completed successfully!');
