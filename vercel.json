@@ -1,21 +1,12 @@
 {
-  "framework": "nextjs",
-  "buildCommand": "node scripts/build-vercel.js",
-  "installCommand": "npm ci --prefer-offline --no-audit",
-  "functions": {
-    "src/app/api/**/*": {
-      "maxDuration": 30
-    }
-  },
+  "buildCommand": "npm run build",
   "env": {
-    "SKIP_ENV_VALIDATION": "1",
-    "NEXT_TELEMETRY_DISABLED": "1"
+    "SKIP_ENV_VALIDATION": "1"
   },
   "build": {
     "env": {
       "SKIP_ENV_VALIDATION": "1",
-      "NODE_OPTIONS": "--max-old-space-size=1536",
-      "NEXT_TELEMETRY_DISABLED": "1"
+      "NODE_OPTIONS": "--max-old-space-size=1536"
     }
   }
 }

@@ -63,7 +63,7 @@ try {
 // Step 4: Build Next.js
 console.log('\n🏗️  Building Next.js application...');
 try {
-  execSync('next build', {
+  execSync('npx next build', {
     stdio: 'inherit',
     env: {
       ...process.env,
