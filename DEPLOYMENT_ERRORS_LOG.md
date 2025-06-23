@@ -1,6 +1,8 @@
 # Deployment Errors and Fixes Log
 
-## Railway Deployment Issues
+## Deployment Issues History
+
+*(This log captures historical deployment errors and their resolutions. Some context might be from previous deployment platforms like Railway but the underlying issues are often general.)*
 
 ### Error 1: ESLint TypeScript Rules Not Found
 **Date:** 2025-06-18  
@@ -89,18 +91,21 @@ Block-scoped variable 'loadMapData' used before its declaration
 
 ---
 
-## Next Steps if Memory Error Persists
+## Next Steps if Memory Error Persists (General & Vercel)
 
-1. **Use Railway's Build Configuration:**
-   - Set `RAILWAY_DOCKERFILE_PATH=Dockerfile.simple` in Railway settings
-   - Add `NODE_OPTIONS=--max-old-space-size=4096` as a build-time environment variable
+1.  **Ensure `NODE_OPTIONS` is set for Vercel Builds:**
+    *   In Vercel Project Settings -> Environment Variables, add `NODE_OPTIONS` with value like `"--max-old-space-size=4096"` or `"--max-old-space-size=8192"`. Ensure it's applied to the "Build" step.
+    *   Our `scripts/build-vercel.js` also tries to apply a default if not set by the platform.
 
-2. **Alternative Approaches:**
-   - Try using `nixpacks.toml` with custom memory settings
-   - Consider using a multi-stage Docker build to reduce final image size
-   - Implement incremental static regeneration (ISR) instead of static generation
+2.  **Review Next.js Build Configuration (`next.config.mjs`):**
+    *   Consider `productionBrowserSourceMaps: false` to reduce memory.
+    *   Experiment with `experimental: { cpus: N }` to limit build parallelism (e.g., N=2 or N=1).
 
-3. **Memory Optimization:**
+3.  **Alternative Approaches (More Advanced):**
+    *   Implement Incremental Static Regeneration (ISR) for pages that can be partially static.
+    *   Break down very large pages or components.
+
+4.  **General Memory Optimization:**
    - Reduce the number of pages built at build time
    - Use dynamic imports for heavy components
    - Split the application into smaller deployable units
@@ -111,13 +116,13 @@ Block-scoped variable 'loadMapData' used before its declaration
 
 ```env
 # Database
-DATABASE_URL=postgresql://...
+DATABASE_URL=postgresql://user:password@host:port/yourdatabase
 
 # Authentication
-NEXTAUTH_URL=https://your-app.railway.app
-NEXTAUTH_SECRET=your-secret-key
+NEXTAUTH_URL=https://yourproject.vercel.app # Or your custom domain
+NEXTAUTH_SECRET=your-secure-random-string # Generate with openssl rand -base64 32
 
-# Redis (optional but recommended)
+# Redis (optional but recommended, e.g., from Vercel KV or Upstash)
 REDIS_URL=redis://...
 
 # OpenAI (for AI features)
@@ -133,28 +138,25 @@ EMAIL_SERVER_PASSWORD=your-app-password
 
 ---
 
-## Successful Build Requirements
+## Successful Build Requirements (Vercel Context)
 
-1. **Memory:** Minimum 4GB allocated for build process
-2. **Node Version:** 20.x (specified in Dockerfile)
-3. **Build Time:** Allow up to 10 minutes for initial build
-4. **Database:** PostgreSQL must be accessible during build for Prisma
-5. **Environment:** `SKIP_ENV_VALIDATION=1` set during build
+1. **Memory:** Sufficient memory allocated for the build process. Set `NODE_OPTIONS="--max-old-space-size=4096"` (or higher) in Vercel build environment variables.
+2. **Node Version:** Node.js 20.x (or as specified in `package.json` engines). Configure in Vercel Project Settings -> General -> Node.js Version.
+3. **Build Time:** Vercel has build time limits (check their current limits, typically generous for most projects).
+4. **Database Access (for Prisma Generate):** If `prisma generate` runs during build, the Vercel build environment needs access to the database.
+5. **Environment Variables:** Ensure all required build-time env vars (like `SKIP_ENV_VALIDATION=1`, `DATABASE_URL` for prisma generate, `NODE_OPTIONS`) are set in Vercel.
 
 ---
 
-## Commands for Local Testing
+## Commands for Local Testing (Simulating Vercel Build)
 
 ```bash
-# Test the build locally with memory limit
-NODE_OPTIONS="--max-old-space-size=4096" npm run build
+# Test the build locally with memory limit and Vercel-like settings
+NODE_OPTIONS="--max-old-space-size=4096" SKIP_ENV_VALIDATION=1 npm run build:vercel
 
-# Test with custom build script
-npm run build:railway
+# Run production build locally (uses `next build` directly after prisma generate)
+NODE_OPTIONS="--max-old-space-size=4096" npm run build:production
 
-# Test Docker build
-docker build -f Dockerfile.simple -t akashic-test .
-
-# Run locally with production build
-npm run build && npm run start
+# Start locally with production build
+npm run start
 ```

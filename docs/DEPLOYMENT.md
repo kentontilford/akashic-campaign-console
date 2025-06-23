@@ -1,15 +1,21 @@
-# Production Deployment Guide
+# Advanced Production Guide (Complement to Vercel Checklist)
 
-## Prerequisites
+This guide provides additional details on database management, security, and other considerations relevant for production deployments, particularly when using platforms like Vercel. For a step-by-step Vercel deployment, see `VERCEL_DEPLOYMENT_CHECKLIST.md`.
 
-- Node.js 18+ installed
-- PostgreSQL 14+ database
-- Redis server (optional but recommended)
-- Domain name with SSL certificate
+## Prerequisites for Vercel Deployment
 
-## Database Migration Strategy
+- Vercel Account
+- Git repository (GitHub, GitLab, Bitbucket)
+- Node.js 18+ (as defined in `package.json` engines and Vercel project settings)
+- PostgreSQL 14+ database (e.g., Vercel Postgres, Neon, Supabase, or other provider accessible by Vercel)
+- Redis server (optional, e.g., Vercel KV, Upstash Redis)
+- Custom Domain Name (optional, Vercel provides `*.vercel.app` domains)
 
-### 1. Initial Deployment
+## Database Migration Strategy (for Vercel)
+
+Managing database schema changes is crucial. Prisma is used for migrations.
+
+### 1. Initial Deployment & Subsequent Migrations
 
 ```bash
 # Generate Prisma client
@@ -30,59 +36,60 @@ npm run prisma:migrate -- --name add_feature_name
 npm run prisma:migrate
 ```
 
-#### Staging/Production
-```bash
-# Always backup before migrating
-npm run db:backup
+#### Staging/Production (Vercel Context)
 
-# Deploy pending migrations
-npm run prisma:migrate:deploy
+**Important:** Vercel runs your application in a serverless environment. Directly running migration commands on the Vercel infrastructure post-deployment requires a specific strategy.
 
-# Verify migration status
-npx prisma migrate status
-```
+1.  **Ensure `DATABASE_URL` in Vercel environment variables points to the correct database.**
+2.  **Strategies for running migrations (choose one or combine):**
+    *   **Locally against Production DB (with EXTREME CAUTION):**
+        *   Temporarily update your local `.env` file with production `DATABASE_URL`.
+        *   Ensure you have proper backups.
+        *   Run: `npx prisma migrate deploy`
+        *   **This is risky due to potential network issues or mistakes directly affecting production.**
+    *   **Via a Secure API Endpoint:**
+        *   Create a protected API route in your Next.js app that, when called with a secret key, executes `npx prisma migrate deploy`.
+        *   This is safer as it runs within Vercel's environment, closer to the DB if using Vercel Postgres.
+        *   See `VERCEL_DEPLOYMENT_CHECKLIST.md` for a conceptual example.
+    *   **Database Provider's Console/Tooling:**
+        *   Many managed database services (like Vercel Postgres, Neon, Supabase) provide ways to apply SQL scripts or manage schema.
+        *   Generate the SQL for your migration: `npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > migration.sql` (Review and apply this SQL).
+    *   **Dedicated Migration Service/Container:** For complex applications, a separate service or container that can run migrations upon deployment signal might be used (more advanced setup).
 
-### 3. Rollback Strategy
+3.  **Verify migration status (if possible via your chosen method or by checking DB schema).**
 
-If a migration fails or causes issues:
+### 3. Rollback Strategy (Migrations)
 
-```bash
-# Restore from backup
-npm run db:restore
+If a migration causes issues:
+1.  **Rollback the code:** Use Vercel's "Promote to Production" feature to revert to a previous stable code deployment.
+2.  **Database Rollback (Complex):**
+    *   Prisma does not offer automatic down-migrations.
+    *   **Restore from backup:** This is the most reliable way if significant data issues occur. This depends on your database provider's backup capabilities.
+    *   **Manual Correction:** Write and apply SQL to revert schema changes or fix data.
+    *   Fix the faulty migration in development, test thoroughly, and then create a new migration to correct the issue.
 
-# Fix the migration in development
-# Then re-deploy when ready
-```
+## Database Backup Strategy (Vercel)
 
-## Backup Strategy
+Vercel itself doesn't directly back up your external database. Backup responsibility lies with your chosen database provider.
 
-### Automated Backups
+- **Managed Database Providers (Vercel Postgres, Neon, Supabase, AWS RDS, etc.):**
+  - These services typically offer automated point-in-time recovery (PITR) and snapshot capabilities. Configure and rely on these.
+  - Familiarize yourself with their backup retention policies and restoration procedures.
 
-Set up a cron job for daily backups:
+- **Manual Backups (using local scripts - for external DBs without strong auto-backups):**
+  - The `npm run db:backup` script (uses `pg_dump`) can still be used.
+  - To do this, you'd configure your local environment to point to the production `DATABASE_URL` (ensure secure connection, VPN, or IP whitelisting if needed).
+  - `npm run db:backup`
+  - Store these backups securely off-site.
+  - This is a manual fallback and less ideal than automated provider backups.
 
-```bash
-# Add to crontab (crontab -e)
-0 2 * * * cd /path/to/app && npm run db:backup >> /var/log/akashic-backup.log 2>&1
-```
+- **Restore from Backup:**
+  - If using provider backups, follow their restoration procedures.
+  - If using manual `pg_dump` files, the `npm run db:restore` script (uses `pg_restore`) can be used, again by configuring your local environment to point to the production database. This is a critical operation requiring care.
 
-### Manual Backup
+## Environment Configuration (Vercel)
 
-```bash
-npm run db:backup
-```
-
-Backups are stored in `./backups/` directory and automatically cleaned up after 7 days.
-
-### Restore from Backup
-
-```bash
-npm run db:restore
-# Follow prompts to select backup file
-```
-
-## Environment Configuration
-
-### 1. Production Environment Variables
+### 1. Production Environment Variables (on Vercel)
 
 ```bash
 # Copy example and update values
@@ -96,90 +103,57 @@ REDIS_PORT=6379
 NEXTAUTH_URL=https://yourdomain.com
 NEXTAUTH_SECRET=<generate-with-openssl-rand-base64-32>
 OPENAI_API_KEY=sk-...
+
+# These are set in the Vercel Dashboard:
+# Project Settings -> Environment Variables
+# Ensure they are available for the correct environments (Production, Preview, Development build/runtime).
+# NEXTAUTH_URL is often automatically set by Vercel as VERCEL_URL or similar system environment variables.
+# You can use system environment variables or set your own.
 ```
 
-### 2. Security Checklist
+### 2. Security Checklist (General & Vercel)
 
-- [ ] Generate strong NEXTAUTH_SECRET (32+ characters)
-- [ ] Use HTTPS for NEXTAUTH_URL
-- [ ] Set secure database password
-- [ ] Enable Redis password if exposed
-- [ ] Review and set CORS origins
-- [ ] Configure rate limiting
-- [ ] Set up monitoring/alerting
+- [ ] Generate strong `NEXTAUTH_SECRET` (32+ characters).
+- [ ] Use HTTPS for `NEXTAUTH_URL` (Vercel handles SSL automatically).
+- [ ] Ensure your database connection (`DATABASE_URL`) uses SSL and has strong credentials.
+- [ ] If using Redis, ensure it's password-protected if exposed (`REDIS_PASSWORD`).
+- [ ] Review CORS origins (Next.js API routes default to same-origin, configurable if needed).
+- [ ] Rate limiting is implemented in `middleware.ts`. Monitor its effectiveness.
+- [ ] Set up monitoring/alerting (Vercel offers some, or integrate external services like Sentry).
+- [ ] Regularly review Vercel security settings and audit logs.
 
-## Build and Deployment
+## Build and Deployment (Vercel)
 
-### 1. Production Build
+Vercel handles the build and deployment process automatically when you connect your Git repository.
 
-```bash
-# Validate environment
-npm run check-env
+### 1. Build Process
+- Vercel detects Next.js projects and typically uses `npm run build` by default.
+- To use our custom script `scripts/build-vercel.js` (which includes Prisma generation and memory settings), you can:
+    - Set the **Build Command** in Vercel Project Settings -> Build & Development Settings to `npm run build:vercel`.
+    - The `build:vercel` script in `package.json` executes `node scripts/build-vercel.js`.
+- Key build-time environment variables like `NODE_OPTIONS="--max-old-space-size=4096"` and `SKIP_ENV_VALIDATION=1` should be set in Vercel's environment variable settings for the build step.
 
-# Run production build
-npm run build:production
+### 2. Deployment
+- After a successful build, Vercel deploys the application.
+- Each push to the connected branch (e.g., `main`) triggers a new deployment.
+- Preview deployments are created for pull requests.
 
-# Start production server
-npm run start
-```
+Vercel manages the serving of the application; no manual `npm run start`, PM2, or Nginx configuration is needed.
 
-### 2. Process Management (PM2)
-
-```bash
-# Install PM2
-npm install -g pm2
-
-# Start application
-pm2 start ecosystem.config.js --env production
-
-# Save PM2 configuration
-pm2 save
-pm2 startup
-```
-
-### 3. Nginx Configuration
-
-```nginx
-server {
-    listen 80;
-    server_name yourdomain.com;
-    return 301 https://$server_name$request_uri;
-}
-
-server {
-    listen 443 ssl http2;
-    server_name yourdomain.com;
-
-    ssl_certificate /path/to/cert.pem;
-    ssl_certificate_key /path/to/key.pem;
-
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-}
-```
-
-## Monitoring
+## Monitoring (Vercel & External)
 
 ### 1. Health Check Endpoint
-
-The application provides a health check at `/api/health`
+The application provides health check endpoints:
+- `/api/health` (detailed)
+- `/api/health-simple` (basic)
+Monitor these using external uptime services.
 
 ### 2. Logging
+- **Application Logs:** Viewable in the Vercel Dashboard (Functions logs for API routes and server-side rendering).
+- **Build Logs:** Viewable in the Vercel Dashboard during and after builds.
+- **Database Logs:** Access through your database provider's dashboard (e.g., Vercel Postgres, Neon).
 
-- Application logs: Check PM2 logs with `pm2 logs`
-- Database logs: PostgreSQL logs location varies by system
-- Nginx logs: `/var/log/nginx/`
-
-### 3. Database Monitoring
+### 3. Database Monitoring (via Provider)
 
 ```sql
 -- Check active connections
